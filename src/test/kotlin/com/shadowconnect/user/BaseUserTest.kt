@@ -39,26 +39,17 @@ abstract class BaseUserTest {
     )
 
 
-    fun createMockClient(): HttpClient =
+    private fun createMockClient(): HttpClient =
         HttpClient(MockEngine) {
             engine {
                 addHandler { request ->
                     when ((request.url.encodedPathAndQuery)) {
                         "/users" -> {
-                            // return empty list or not for test?
-                            if (request.url.parameters.contains("empty")) {
-                                respond(
-                                    Json.encodeToString(emptyList<User>()),
-                                    HttpStatusCode.OK,
-                                    headersOf("content-Type", ContentType.Application.Json.toString())
-                                )
-                            } else {
-                                respond(
-                                    Json.encodeToString(testUsers),
-                                    HttpStatusCode.OK,
-                                    headersOf("content-Type", ContentType.Application.Json.toString())
-                                )
-                            }
+                            respond(
+                                Json.encodeToString(testUsers),
+                                HttpStatusCode.OK,
+                                headersOf("content-Type", ContentType.Application.Json.toString())
+                            )
                         }
                         else -> error("NO!: ${request.url.toString()}")
                     }
