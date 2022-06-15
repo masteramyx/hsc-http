@@ -1,7 +1,7 @@
 package com.shadowconnect.routes
 
-import com.shadowconnect.model.User
-import com.shadowconnect.model.userStorage
+import com.shadowconnect.model.Student
+import com.shadowconnect.model.studentStorage
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -11,14 +11,14 @@ import io.ktor.server.routing.*
 fun Route.userRouting() {
 
     //route block sets endpoint and subsequent blocks set http methods
-    route("/users") {
+    route("/students") {
         // region get
         /**
          * Return full list of users
          */
         get {
-            if (userStorage.isNotEmpty()) {
-                call.respond(userStorage)
+            if (studentStorage.isNotEmpty()) {
+                call.respond(studentStorage)
             } else {
                 call.respondText("We have no users", status = HttpStatusCode.OK)
             }
@@ -33,7 +33,7 @@ fun Route.userRouting() {
                 status = HttpStatusCode.BadRequest
             )
 
-            val user = userStorage.find { it.id == id } ?: return@get call.respondText(
+            val user = studentStorage.find { it.id == id } ?: return@get call.respondText(
                 "No customer with id: $id",
                 status = HttpStatusCode.NotFound
             )
@@ -46,8 +46,8 @@ fun Route.userRouting() {
          * POST a JSON representation of user object to be stored in `database`
          */
         post {
-            val user: User = call.receive()
-            userStorage.add(user)
+            val student: Student = call.receive()
+            studentStorage.add(student)
             call.respondText(
                 "User Stored in `database`", status = HttpStatusCode.Created
             )
@@ -57,7 +57,7 @@ fun Route.userRouting() {
         // region delete
         delete("{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            if (userStorage.removeIf { it.id == id }) {
+            if (studentStorage.removeIf { it.id == id }) {
                 call.respondText("User removed from `database", status = HttpStatusCode.Accepted)
             } else {
                 call.respondText("User not found", status = HttpStatusCode.NotFound)

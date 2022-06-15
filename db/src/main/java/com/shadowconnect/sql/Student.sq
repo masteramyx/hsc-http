@@ -1,0 +1,11 @@
+CREATE TABLE student
+(
+    id         SERIAL8 PRIMARY KEY,
+    first_name varchar     NOT NULL,
+    last_name  varchar     NOT NULL,
+    email      varchar     NOT NULL,
+    phone      VARCHAR(15) NOT NULL
+);
+
+isEmailAlreadyExists:
+SELECT id FROM users WHERE email = ?;

@@ -3,6 +3,13 @@
 As this project stands, it's purpose is to serve as a REST API against the database of the HealthShadow mobile
 applications
 
+* # Tech/Tools
+  * Kotlin:
+  * Ktor:
+  * SQLDelight:
+  * PostgreSQL:
+
+
 * # Testing
     * ## Local Tests
       WIP

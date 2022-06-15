@@ -1,26 +1,12 @@
-package com.shadowconnect.user
+package com.shadowconnect.student
 
-import com.shadowconnect.model.User
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.mock.*
+import com.shadowconnect.model.Student
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.testing.*
-import io.ktor.websocket.*
-import io.mockk.*
-import io.mockk.impl.annotations.RelaxedMockK
-import jdk.internal.org.jline.utils.Colors.s
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.decodeFromString
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.serializer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +16,7 @@ import kotlin.test.assertEquals
  * Tests for all user endpoints.
  * There should both success and failure tests for all endpoints.
  */
-class UserRouteTest : BaseUserTest() {
+class StudentRouteTest : BaseStudentTest() {
 
     // region setup
     @Before
@@ -56,11 +42,11 @@ class UserRouteTest : BaseUserTest() {
 
     @Test
     fun testGetAllUsers() = testApplication {
-        val response = this@UserRouteTest.mockClient.get("/users")
+        val response = this@StudentRouteTest.mockClient.get("/students")
         assertEquals(HttpStatusCode.OK, response.status)
         val userResponse = response.bodyAsText()
         println(userResponse)
-        val obj = Json.decodeFromString<List<User>>(userResponse)
+        val obj = Json.decodeFromString<List<Student>>(userResponse)
         assertEquals(3, obj.size)
     }
 }
