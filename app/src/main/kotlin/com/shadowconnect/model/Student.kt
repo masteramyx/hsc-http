@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class Student(
     @SerialName("id")
     val id: String,
     @SerialName("first_name")
@@ -16,4 +16,8 @@ data class User(
 )
 
 //todo store this in database...firebase?
-val userStorage = mutableListOf<User>()
+val studentStorage = mutableListOf(
+    Student("1", "Kyle", "Franklin", "abc@abc.com"),
+    Student("2", "Kyle", "Franklin", "abc@abc.com"),
+    Student("3", "Kyle", "Franklin", "abc@abc.com")
+)

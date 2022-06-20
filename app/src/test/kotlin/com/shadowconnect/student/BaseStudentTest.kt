@@ -1,6 +1,6 @@
-package com.shadowconnect.user
+package com.shadowconnect.student
 
-import com.shadowconnect.model.User
+import com.shadowconnect.model.Student
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.http.*
@@ -18,7 +18,7 @@ import org.junit.Before
  * This issue led to decision to use MockEngine. Maybe circle back if
  * mockk makes sense over MockEngine.
  */
-abstract class BaseUserTest {
+abstract class BaseStudentTest {
     lateinit var mockClient: HttpClient
 
 
@@ -32,10 +32,10 @@ abstract class BaseUserTest {
         mockClient.close()
     }
 
-    val testUsers = listOf<User>(
-        User("1", "Kyle", "Franklin", "abc@abc.com"),
-        User("2", "Kyle", "Franklin", "abc@abc.com"),
-        User("3", "Kyle", "Franklin", "abc@abc.com")
+    val testStudents = listOf<Student>(
+        Student("1", "Kyle", "Franklin", "abc@abc.com"),
+        Student("2", "Kyle", "Franklin", "abc@abc.com"),
+        Student("3", "Kyle", "Franklin", "abc@abc.com")
     )
 
 
@@ -44,9 +44,9 @@ abstract class BaseUserTest {
             engine {
                 addHandler { request ->
                     when ((request.url.encodedPathAndQuery)) {
-                        "/users" -> {
+                        "/students" -> {
                             respond(
-                                Json.encodeToString(testUsers),
+                                Json.encodeToString(testStudents),
                                 HttpStatusCode.OK,
                                 headersOf("content-Type", ContentType.Application.Json.toString())
                             )
