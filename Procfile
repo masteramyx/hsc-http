@@ -1,1 +1,1 @@
-web: ./build/install/hsc-http/bin/ktor-get-started-sample
+web: ./build/install/hsc-http/bin/hsc-http
