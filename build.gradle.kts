@@ -36,8 +36,9 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-task("stage")
-    .setDependsOn(listOf("clean", "build"))
+tasks {
+    create("stage").dependsOn("installDist")
+}
 
 dependencies {
 //    implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
