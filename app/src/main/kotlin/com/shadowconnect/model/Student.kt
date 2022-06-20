@@ -16,4 +16,8 @@ data class Student(
 )
 
 //todo store this in database...firebase?
-val studentStorage = mutableListOf<Student>()
+val studentStorage = mutableListOf(
+    Student("1", "Kyle", "Franklin", "abc@abc.com"),
+    Student("2", "Kyle", "Franklin", "abc@abc.com"),
+    Student("3", "Kyle", "Franklin", "abc@abc.com")
+)
