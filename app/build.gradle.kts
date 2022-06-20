@@ -6,6 +6,7 @@ val sql_delight_version: String by project
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     java
 }
 
