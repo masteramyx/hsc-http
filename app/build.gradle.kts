@@ -5,9 +5,34 @@ val mockk_version: String by project
 val sql_delight_version: String by project
 
 plugins {
+    application
     kotlin("jvm")
     kotlin("plugin.serialization")
+    id("com.github.johnrengelman.shadow")
     java
+}
+
+tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class.java) {
+    manifest {
+        attributes.set("Main-Class", "com.shadowconnect.ApplicationKt")
+    }
+}
+
+// Configure distribution - this is the archives that are pushed up to heroku.
+//distributions {
+//    main {
+//        distributionBaseName.set("hsc-http")
+//        contents {
+//            from("build/libs")
+//        }
+//    }
+//}
+
+application {
+    mainClass.set("com.shadowconnect.ApplicationKt")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 group = "com.shadowconnect"
@@ -18,7 +43,11 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
+tasks {
+    create("stage").dependsOn("build", "installDist")
+}
 
+tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
     project(":db")

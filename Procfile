@@ -1,1 +1,1 @@
-web: ./build/install/hsc-http/bin/hsc-http
+web: app/build/install/app/bin/app

@@ -22,32 +22,21 @@ repositories {
 }
 
 plugins {
-    application
+    //application
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("jvm") version "1.6.21"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
-    java
 }
 
 group = "com.shadowconnect"
 version = "0.0.1"
 
-
-tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-//    mainClassName = "com.shadowconnect.ApplicationKt"
-}
-
-application {
-    mainClass.set("com.shadowconnect.ApplicationKt")
-    mainClassName = "com.shadowconnect.ApplicationKt"
-
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
-tasks {
-    create("stage").dependsOn("build", "installDist")
-}
+//application {
+//    mainClass.set("com.shadowconnect.ApplicationKt")
+//
+//    val isDevelopment: Boolean = project.ext.has("development")
+//    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+//}
 
 dependencies {
 //    implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
