@@ -5,9 +5,15 @@ val mockk_version: String by project
 val sql_delight_version: String by project
 
 plugins {
+    application
     kotlin("jvm")
     kotlin("plugin.serialization")
-    java
+}
+
+application {
+    mainClass.set("com.shadowconnect.ApplicationKt")
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
 group = "com.shadowconnect"
@@ -18,7 +24,11 @@ repositories {
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
-
+tasks {
+    create("stage").dependsOn("build", "installDist")
+}
+// build the project before we aggregate all the files for distribution.
+tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
     project(":db")
