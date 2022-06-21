@@ -8,29 +8,10 @@ plugins {
     application
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.github.johnrengelman.shadow")
-    java
 }
-
-tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class.java) {
-    manifest {
-        attributes.set("Main-Class", "com.shadowconnect.ApplicationKt")
-    }
-}
-
-// Configure distribution - this is the archives that are pushed up to heroku.
-//distributions {
-//    main {
-//        distributionBaseName.set("hsc-http")
-//        contents {
-//            from("build/libs")
-//        }
-//    }
-//}
 
 application {
     mainClass.set("com.shadowconnect.ApplicationKt")
-
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
@@ -46,7 +27,7 @@ repositories {
 tasks {
     create("stage").dependsOn("build", "installDist")
 }
-
+// build the project before we aggregate all the files for distribution.
 tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
