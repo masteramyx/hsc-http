@@ -1,5 +1,6 @@
 package com.shadowconnect
 
+import com.shadowconnect.db.DatabaseRepositoryImpl
 import io.ktor.server.application.*
 import com.shadowconnect.plugins.*
 
@@ -10,4 +11,7 @@ fun main(args: Array<String>): Unit =
 fun Application.module() {
     configureRouting()
     configureSerialization()
+
+    val d = DatabaseRepositoryImpl()
+    d.testConnection()
 }

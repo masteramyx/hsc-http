@@ -1,6 +1,6 @@
 package com.shadowconnect.plugins
 
-import com.shadowconnect.routes.userRouting
+import com.shadowconnect.routes.studentRouting
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -9,7 +9,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
 
     routing {
-        userRouting()
+        studentRouting()
         get("/") {
             call.respondText("Hello World!")
         }

@@ -8,6 +8,7 @@ applications
   * Ktor:
   * SQLDelight:
   * PostgreSQL:
+  * JetBrains Exposed: 
 
 
 * # Testing

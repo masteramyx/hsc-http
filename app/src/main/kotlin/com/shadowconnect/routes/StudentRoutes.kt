@@ -1,5 +1,6 @@
 package com.shadowconnect.routes
 
+import com.shadowconnect.db.DatabaseRepositoryImpl
 import com.shadowconnect.model.Student
 import com.shadowconnect.model.studentStorage
 import io.ktor.http.*
@@ -8,7 +9,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.userRouting() {
+fun Route.studentRouting() {
 
     //route block sets endpoint and subsequent blocks set http methods
     route("/students") {
@@ -18,6 +19,7 @@ fun Route.userRouting() {
          */
         get {
             if (studentStorage.isNotEmpty()) {
+                val t = DatabaseRepositoryImpl()
                 call.respond(studentStorage)
             } else {
                 call.respondText("We have no users", status = HttpStatusCode.OK)
