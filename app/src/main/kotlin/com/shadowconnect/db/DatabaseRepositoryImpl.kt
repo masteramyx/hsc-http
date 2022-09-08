@@ -2,89 +2,235 @@ package com.shadowconnect.db
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.net.URI
-import java.net.URISyntaxException
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
-
 
 /**
- * Database Schema
- */
-
-object Organization : Table() {
-    val id = integer("org_id").autoIncrement() // Column<Integer>
-    val address = varchar("address", length = 50) // Column<String>
-    val email = varchar("email", length = 50) // Column<String>
-    val phone = varchar("phone", length = 20) // Column<String>
-    val website = varchar("website", length = 30) // Column<String>
-
-    override val primaryKey = PrimaryKey(id) // name is optional here
-}
-
-object Professional : Table() {
-    val id = integer("prof_id").autoIncrement() // Column<Integer>
-    val first_name = varchar("f_name", length = 50) // Column<String>
-    val last_name = varchar("l_name", length = 50) // Column<String>
-    val email = varchar("email", length = 50) // Column<String>
-    val phone = varchar("phone", length = 20) // Column<String>
-    val orgId = (integer("organization_id") references Organization.id).nullable() // Column<Int?>
-
-    override val primaryKey = PrimaryKey(id) // name is optional here
-}
-
-object Student : Table() {
-    val id = integer("student_id").autoIncrement() // Column<Integer>
-    val first_name = varchar("f_name", length = 50) // Column<String>
-    val last_name = varchar("l_name", length = 50) // Column<String>
-    val email = varchar("email", length = 50) // Column<String>
-    val phone = varchar("phone", length = 20) // Column<String>
-    val orgId = (integer("organization_id") references Organization.id).nullable() // Column<Int?>
-
-    override val primaryKey = PrimaryKey(id) // name is optional here
-}
-
-/**
- * Class to handle reading/writing to databsse
+ * Class to handle reading/writing to database
  * @see https://github.com/JetBrains/Exposed/wiki/Getting-Started
+ *
+ *
  */
-class DatabaseRepositoryImpl {
+class DatabaseRepositoryImpl(val database: Database) {
 
-    // This does not "connect" to database but rather provides a connection description for future use.
-    // Real connections are instantiated inside a 'transaction' block
-    var db: Database = Database.connect(
-        "jdbc:postgresql://localhost:5432/kyleamyx",
-        driver = "org.postgresql.Driver",
-        user = "kyleamyx"
-    )
-
-    init {
+    fun createTables() {
         transaction {
+            addLogger(StdOutSqlLogger)
             SchemaUtils.create(Organization, Professional, Student)
         }
     }
 
-    fun testConnection() {
-        println("SCHEMA IS  ${db.config.defaultSchema}")
-        transaction {
-            val q = Organization.selectAll()
-
-            q.forEach {
-                println("QUERY IS $it")
+    // region organization
+    fun getOrganizations(): OrgList {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Organization.selectAll()
+            return@transaction mutableListOf<Org>().apply {
+                queryResult.map { row ->
+                    add(
+                        // todo extenstion functions for all
+                        Org(
+                            name = row[Organization.name],
+                            address = row[Organization.address],
+                            email = row[Organization.email],
+                            phone = row[Organization.phone],
+                            website = row[Organization.website]
+                        )
+                    )
+                }
             }
         }
-
     }
 
-    @Throws(URISyntaxException::class, SQLException::class)
-    private fun getConnection(): Connection? {
-        val dbUri = URI(System.getenv("DATABASE_URL"))
-        val username: String = dbUri.getUserInfo().split(":").get(0)
-        val password: String = dbUri.getUserInfo().split(":").get(1)
-        val dbUrl =
-            "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require"
-        return DriverManager.getConnection(dbUrl, username, password)
+    fun getOrganizationById(id: Int): Org? {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Organization.select {
+                Organization.id eq id
+            }
+
+            if (queryResult.empty()) {
+                return@transaction null
+            } else {
+                return@transaction queryResult.map { row ->
+                    Org(
+                        name = row[Organization.name],
+                        address = row[Organization.address],
+                        email = row[Organization.email],
+                        phone = row[Organization.phone],
+                        website = row[Organization.website]
+                    )
+                }.firstOrNull()
+            }
+        }
     }
+
+    fun addOrganization(org: Org) {
+        transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+
+            Organization.insert {
+                it[name] = org.name
+                it[email] = org.email
+                it[address] = org.address
+                it[phone] = org.phone
+                it[website] = org.website
+            } get Organization.id
+        }
+    }
+
+    fun removeOrganization(id: Int): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val numberOfDeletedRows = Organization.deleteWhere {
+                Organization.id eq id
+            }
+            return@transaction numberOfDeletedRows > 0
+        }
+    }
+
+    // endregion
+
+    // region professional
+    fun getProfessionals(): ProfList {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Professional.selectAll()
+            return@transaction mutableListOf<Prof>().apply {
+                queryResult.map { row ->
+                    add(
+                        Prof(
+                            first_name = row[Professional.first_name],
+                            last_name = row[Professional.last_name],
+                            email = row[Professional.email],
+                            phone = row[Professional.phone],
+                            org_id = row[Professional.orgId]?.value
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun getProfessionalById(id: Int): Prof? {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Professional.select {
+                Professional.id eq id
+            }
+            return@transaction queryResult.map { row ->
+                Prof(
+                    first_name = row[Professional.first_name],
+                    last_name = row[Professional.last_name],
+                    email = row[Professional.email],
+                    phone = row[Professional.phone],
+                    org_id = row[Professional.orgId]?.value
+                )
+            }.firstOrNull()
+        }
+    }
+
+    fun addProfessional(professional: Prof) {
+        transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+
+            Professional.insert {
+                it[first_name] = professional.first_name
+                it[last_name] = professional.last_name
+                it[email] = professional.email
+                it[phone] = professional.phone
+                it[orgId] = professional.org_id
+            } get Professional.id
+        }
+    }
+
+    fun removeProfessional(id: Int): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val numberOfDeletedRows = Professional.deleteWhere {
+                Professional.id eq id
+            }
+            return@transaction numberOfDeletedRows > 0
+        }
+    }
+
+    // endregion
+
+    // region students
+    fun getStudents(): StudentList {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Student.selectAll()
+            return@transaction mutableListOf<Stu>().apply {
+                queryResult.map { row ->
+                    add(
+                        Stu(
+                            firstName = row[Student.first_name],
+                            lastName = row[Student.last_name],
+                            phone = row[Student.phone],
+                            orgId = row[Student.orgId]?.value,
+                            email = row[Student.email]
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun getStudentById(id: Int): Stu? {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val queryResult = Student.select {
+                Student.id eq id
+            }
+            return@transaction queryResult.map { row ->
+                Stu(
+                    firstName = row[Student.first_name],
+                    lastName = row[Student.last_name],
+                    phone = row[Student.phone],
+                    orgId = row[Student.orgId]?.value,
+                    email = row[Student.email]
+                )
+            }.firstOrNull()
+        }
+    }
+
+
+    fun addStudent(student: Stu) {
+        transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+
+            val id = Student.insertAndGetId {
+                it[first_name] = student.firstName
+                it[last_name] = student.lastName
+                it[email] = student.email
+                it[phone] = student.phone
+                it[orgId] = student.orgId
+            }
+            println("NEW ID: $id")
+        }
+    }
+
+    fun removeStudent(id: Int): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val numberOfDeletedRows = Student.deleteWhere {
+                Student.id eq id
+            }
+            return@transaction numberOfDeletedRows > 0
+        }
+    }
+
+
+    // endregion
 }
-

@@ -1,8 +1,7 @@
 package com.shadowconnect.routes
 
-import com.shadowconnect.db.DatabaseRepositoryImpl
 import com.shadowconnect.model.Student
-import com.shadowconnect.model.studentStorage
+import com.shadowconnect.plugins.db
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -18,9 +17,9 @@ fun Route.studentRouting() {
          * Return full list of users
          */
         get {
-            if (studentStorage.isNotEmpty()) {
-                val t = DatabaseRepositoryImpl()
-                call.respond(studentStorage)
+            val studentsFromDb = db.getStudents()
+            if (studentsFromDb.isNotEmpty()) {
+                call.respond(studentsFromDb)
             } else {
                 call.respondText("We have no users", status = HttpStatusCode.OK)
             }
@@ -35,11 +34,12 @@ fun Route.studentRouting() {
                 status = HttpStatusCode.BadRequest
             )
 
-            val user = studentStorage.find { it.id == id } ?: return@get call.respondText(
-                "No customer with id: $id",
-                status = HttpStatusCode.NotFound
-            )
-            call.respond(user)
+            val studentFromDb = db.getStudentById(id.toInt())
+            if (studentFromDb == null) {
+                call.respondText("We have no student with that id", status = HttpStatusCode.OK)
+            } else {
+                call.respond(studentFromDb)
+            }
         }
         // endregion
 
@@ -49,7 +49,7 @@ fun Route.studentRouting() {
          */
         post {
             val student: Student = call.receive()
-            studentStorage.add(student)
+            db.addStudent(student)
             call.respondText(
                 "User Stored in `database`", status = HttpStatusCode.Created
             )
@@ -59,7 +59,7 @@ fun Route.studentRouting() {
         // region delete
         delete("{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            if (studentStorage.removeIf { it.id == id }) {
+            if (db.removeStudent(id.toInt())) {
                 call.respondText("User removed from `database", status = HttpStatusCode.Accepted)
             } else {
                 call.respondText("User not found", status = HttpStatusCode.NotFound)

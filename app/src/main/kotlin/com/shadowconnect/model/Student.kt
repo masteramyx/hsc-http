@@ -6,18 +6,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Student(
     @SerialName("id")
-    val id: String,
+    val id: Int? = null,
     @SerialName("first_name")
     val firstName: String,
     @SerialName("last_name")
     val lastName: String,
     @SerialName("email")
-    val email: String
-)
-
-//todo store this in database...firebase?
-val studentStorage = mutableListOf(
-    Student("1", "Kyle", "Franklin", "abc@abc.com"),
-    Student("2", "Kyle", "Franklin", "abc@abc.com"),
-    Student("3", "Kyle", "Franklin", "abc@abc.com")
+    val email: String,
+    @SerialName("phone")
+    val phone: String,
+    @SerialName("organization_id")
+    val orgId: Int? = null
 )

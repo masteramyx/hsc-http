@@ -1,5 +1,7 @@
 package com.shadowconnect.plugins
 
+import com.shadowconnect.routes.organizationRoutes
+import com.shadowconnect.routes.professionalRouting
 import com.shadowconnect.routes.studentRouting
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -10,6 +12,8 @@ fun Application.configureRouting() {
 
     routing {
         studentRouting()
+        organizationRoutes()
+        professionalRouting()
         get("/") {
             call.respondText("Hello World!")
         }
