@@ -6,14 +6,13 @@ data class Professional(
     @SerialName("id")
     val id: Int? = null,
     @SerialName("first_name")
-    val first_name: String,
+    val firstName: String,
     @SerialName("last_name")
-    val last_name: String,
+    val lastName: String,
     @SerialName("email")
-    val email: String,
+    var email: String,
     @SerialName("phone")
     val phone: String,
     @SerialName("org_id")
-    val org_id: Int?
-) {
-}
+    val orgId: Int?
+)

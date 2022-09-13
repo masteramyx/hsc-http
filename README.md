@@ -22,5 +22,5 @@ applications
 
 * # TODO
     [] Dependency Injection (Koin, Guice?, etc.)  
-    [] Database (Firebase, Postgres, Mongodb, etc..)  
+    [x] Database (~~Firebase~~, **Heroku Postgres**, ~~Mongodb~~, etc..)  
     [] 

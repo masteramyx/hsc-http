@@ -56,6 +56,14 @@ fun Route.studentRouting() {
         }
         // endregion
 
+        put("{id?}") {
+            val student: Student = call.receive()
+            db.updateStudent(student)
+            call.respondText(
+                "User updated in `database`", status = HttpStatusCode.Created
+            )
+        }
+
         // region delete
         delete("{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)

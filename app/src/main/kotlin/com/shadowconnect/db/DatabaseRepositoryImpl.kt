@@ -1,13 +1,11 @@
 package com.shadowconnect.db
 
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 /**
  * Class to handle reading/writing to database
  * @see https://github.com/JetBrains/Exposed/wiki/Getting-Started
- *
  *
  */
 class DatabaseRepositoryImpl(val database: Database) {
@@ -74,6 +72,24 @@ class DatabaseRepositoryImpl(val database: Database) {
         }
     }
 
+    //todo get this func working and done clean
+    fun updateOrganization(organization: Org): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+            val organizationUpdated = Organization.update(
+                where = { Organization.id eq organization.id }
+            ) {
+                it[name] = organization.name
+                it[address] = organization.address
+                it[email] = organization.email
+                it[phone] = organization.phone
+                it[website] = organization.website
+            }
+            return@transaction organizationUpdated > 0
+        }
+    }
+
     // endregion
 
     // region professional
@@ -83,7 +99,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             addLogger(StdOutSqlLogger)
             val queryResult = Professional.selectAll()
             return@transaction mutableListOf<Prof>().apply {
-                queryResult.map { row -> add(row.toProfessional()) }
+                queryResult.map { row -> add(row.toProfessional(null)) }
             }
         }
     }
@@ -95,7 +111,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             val queryResult = Professional.select {
                 Professional.id eq id
             }
-            return@transaction queryResult.map { row -> row.toProfessional() }.firstOrNull()
+            return@transaction queryResult.map { row -> row.toProfessional(id) }.firstOrNull()
         }
     }
 
@@ -105,11 +121,11 @@ class DatabaseRepositoryImpl(val database: Database) {
             addLogger(StdOutSqlLogger)
 
             val id = Professional.insertAndGetId {
-                it[first_name] = professional.first_name
-                it[last_name] = professional.last_name
+                it[first_name] = professional.firstName
+                it[last_name] = professional.lastName
                 it[email] = professional.email
                 it[phone] = professional.phone
-                it[orgId] = professional.org_id
+                it[orgId] = professional.orgId
             }
             println("NEW ID: $id")
         }
@@ -127,13 +143,19 @@ class DatabaseRepositoryImpl(val database: Database) {
     }
 
     //todo get this func working and done clean
-    fun updateProfessional(id: Int): Boolean {
+    fun updateProfessional(professional: Prof): Boolean {
         return transaction {
             // Log our SQL Queries
             addLogger(StdOutSqlLogger)
 
-            val professionalUpdated = Professional.update {
-                Professional.id eq id
+            val professionalUpdated = Professional.update(
+                where = { Professional.id eq professional.id }
+            ) {
+                it[first_name] = professional.firstName
+                it[last_name] = professional.lastName
+                it[email] = professional.email
+                it[phone] = professional.phone
+                it[orgId] = professional.orgId
             }
             return@transaction professionalUpdated > 0
         }
@@ -192,6 +214,25 @@ class DatabaseRepositoryImpl(val database: Database) {
         }
     }
 
+    //todo get this func working and done clean
+    fun updateStudent(student: Stu): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+
+            val studentUpdated = Student.update(
+                where = { Student.id eq student.id }
+            ) {
+                it[first_name] = student.firstName
+                it[last_name] = student.lastName
+                it[email] = student.email
+                it[phone] = student.phone
+                it[orgId] = student.orgId
+            }
+            return@transaction studentUpdated > 0
+        }
+    }
+
 
     // endregion
 }
@@ -206,13 +247,14 @@ private fun ResultRow.toOrganization() =
         website = this[Organization.website]
     )
 
-private fun ResultRow.toProfessional() =
+private fun ResultRow.toProfessional(id: Int?) =
     Prof(
-        first_name = this[Professional.first_name],
-        last_name = this[Professional.last_name],
+        id = id,
+        firstName = this[Professional.first_name],
+        lastName = this[Professional.last_name],
         email = this[Professional.email],
         phone = this[Professional.phone],
-        org_id = this[Professional.orgId]?.value
+        orgId = this[Professional.orgId]?.value
     )
 
 private fun ResultRow.toStudent() =

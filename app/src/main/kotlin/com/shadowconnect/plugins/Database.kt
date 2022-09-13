@@ -1,6 +1,7 @@
 package com.shadowconnect.plugins
 
 import com.shadowconnect.db.DatabaseRepositoryImpl
+import com.shadowconnect.db.DbPropertiesReader
 import org.jetbrains.exposed.sql.Database
 
 fun configureDatabase() {
@@ -14,9 +15,10 @@ fun configureDatabase() {
 // Local Database Connection
 object DbSettings {
     val db: Database = Database.connect(
-        "jdbc:postgresql://localhost:5432/kyleamyx",
+        url = DbPropertiesReader.getProperty("url"),
         driver = "org.postgresql.Driver",
-        user = "kyleamyx"
+        user = DbPropertiesReader.getProperty("username"),
+        password = DbPropertiesReader.getProperty("password")
     )
 }
 

@@ -46,6 +46,14 @@ fun Route.organizationRoutes() {
             )
         }
 
+        put {
+            val organization: Organization = call.receive()
+            db.updateOrganization(organization)
+            call.respondText(
+                "Organization updated in `database`", status = HttpStatusCode.Created
+            )
+        }
+
         delete("{id?}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
             if (db.removeOrganization(id.toInt())) {

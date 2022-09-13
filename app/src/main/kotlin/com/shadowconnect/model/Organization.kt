@@ -12,7 +12,7 @@ data class Organization(
     @SerialName("address")
     val address: String,
     @SerialName("email")
-    val email: String,
+    var email: String,
     @SerialName("phone")
     val phone: String,
     @SerialName("website")
