@@ -1,22 +1,11 @@
 package com.shadowconnect.plugins
 
 import com.shadowconnect.db.DatabaseRepositoryImpl
-import com.shadowconnect.db.Stu
 import org.jetbrains.exposed.sql.Database
 
 fun configureDatabase() {
-    // TESTING HEERE REMOVE!!!
-    db.apply {
-        addStudent(
-            Stu(
-                firstName = "Kyle",
-                lastName = "Amyx",
-                email = "masteramyx@gmail.com",
-                phone = "4045397567",
-                orgId = null
-            )
-        )
-    }
+    // Create DB Schema on server
+    db.createTables()
 }
 
 

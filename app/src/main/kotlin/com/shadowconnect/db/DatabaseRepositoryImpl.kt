@@ -1,6 +1,7 @@
 package com.shadowconnect.db
 
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 /**
@@ -25,18 +26,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             addLogger(StdOutSqlLogger)
             val queryResult = Organization.selectAll()
             return@transaction mutableListOf<Org>().apply {
-                queryResult.map { row ->
-                    add(
-                        // todo extenstion functions for all
-                        Org(
-                            name = row[Organization.name],
-                            address = row[Organization.address],
-                            email = row[Organization.email],
-                            phone = row[Organization.phone],
-                            website = row[Organization.website]
-                        )
-                    )
-                }
+                queryResult.map { row -> add(row.toOrganization()) }
             }
         }
     }
@@ -52,15 +42,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             if (queryResult.empty()) {
                 return@transaction null
             } else {
-                return@transaction queryResult.map { row ->
-                    Org(
-                        name = row[Organization.name],
-                        address = row[Organization.address],
-                        email = row[Organization.email],
-                        phone = row[Organization.phone],
-                        website = row[Organization.website]
-                    )
-                }.firstOrNull()
+                return@transaction queryResult.map { row -> row.toOrganization() }.firstOrNull()
             }
         }
     }
@@ -70,13 +52,14 @@ class DatabaseRepositoryImpl(val database: Database) {
             // Log our SQL Queries
             addLogger(StdOutSqlLogger)
 
-            Organization.insert {
+            val id = Organization.insertAndGetId {
                 it[name] = org.name
                 it[email] = org.email
                 it[address] = org.address
                 it[phone] = org.phone
                 it[website] = org.website
-            } get Organization.id
+            }
+            println("NEW ID: $id")
         }
     }
 
@@ -100,17 +83,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             addLogger(StdOutSqlLogger)
             val queryResult = Professional.selectAll()
             return@transaction mutableListOf<Prof>().apply {
-                queryResult.map { row ->
-                    add(
-                        Prof(
-                            first_name = row[Professional.first_name],
-                            last_name = row[Professional.last_name],
-                            email = row[Professional.email],
-                            phone = row[Professional.phone],
-                            org_id = row[Professional.orgId]?.value
-                        )
-                    )
-                }
+                queryResult.map { row -> add(row.toProfessional()) }
             }
         }
     }
@@ -122,15 +95,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             val queryResult = Professional.select {
                 Professional.id eq id
             }
-            return@transaction queryResult.map { row ->
-                Prof(
-                    first_name = row[Professional.first_name],
-                    last_name = row[Professional.last_name],
-                    email = row[Professional.email],
-                    phone = row[Professional.phone],
-                    org_id = row[Professional.orgId]?.value
-                )
-            }.firstOrNull()
+            return@transaction queryResult.map { row -> row.toProfessional() }.firstOrNull()
         }
     }
 
@@ -139,13 +104,14 @@ class DatabaseRepositoryImpl(val database: Database) {
             // Log our SQL Queries
             addLogger(StdOutSqlLogger)
 
-            Professional.insert {
+            val id = Professional.insertAndGetId {
                 it[first_name] = professional.first_name
                 it[last_name] = professional.last_name
                 it[email] = professional.email
                 it[phone] = professional.phone
                 it[orgId] = professional.org_id
-            } get Professional.id
+            }
+            println("NEW ID: $id")
         }
     }
 
@@ -160,6 +126,19 @@ class DatabaseRepositoryImpl(val database: Database) {
         }
     }
 
+    //todo get this func working and done clean
+    fun updateProfessional(id: Int): Boolean {
+        return transaction {
+            // Log our SQL Queries
+            addLogger(StdOutSqlLogger)
+
+            val professionalUpdated = Professional.update {
+                Professional.id eq id
+            }
+            return@transaction professionalUpdated > 0
+        }
+    }
+
     // endregion
 
     // region students
@@ -169,17 +148,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             addLogger(StdOutSqlLogger)
             val queryResult = Student.selectAll()
             return@transaction mutableListOf<Stu>().apply {
-                queryResult.map { row ->
-                    add(
-                        Stu(
-                            firstName = row[Student.first_name],
-                            lastName = row[Student.last_name],
-                            phone = row[Student.phone],
-                            orgId = row[Student.orgId]?.value,
-                            email = row[Student.email]
-                        )
-                    )
-                }
+                queryResult.map { row -> add(row.toStudent()) }
             }
         }
     }
@@ -191,15 +160,7 @@ class DatabaseRepositoryImpl(val database: Database) {
             val queryResult = Student.select {
                 Student.id eq id
             }
-            return@transaction queryResult.map { row ->
-                Stu(
-                    firstName = row[Student.first_name],
-                    lastName = row[Student.last_name],
-                    phone = row[Student.phone],
-                    orgId = row[Student.orgId]?.value,
-                    email = row[Student.email]
-                )
-            }.firstOrNull()
+            return@transaction queryResult.map { row -> row.toStudent() }.firstOrNull()
         }
     }
 
@@ -234,3 +195,31 @@ class DatabaseRepositoryImpl(val database: Database) {
 
     // endregion
 }
+
+
+private fun ResultRow.toOrganization() =
+    Org(
+        name = this[Organization.name],
+        address = this[Organization.address],
+        email = this[Organization.email],
+        phone = this[Organization.phone],
+        website = this[Organization.website]
+    )
+
+private fun ResultRow.toProfessional() =
+    Prof(
+        first_name = this[Professional.first_name],
+        last_name = this[Professional.last_name],
+        email = this[Professional.email],
+        phone = this[Professional.phone],
+        org_id = this[Professional.orgId]?.value
+    )
+
+private fun ResultRow.toStudent() =
+    Stu(
+        firstName = this[Student.first_name],
+        lastName = this[Student.last_name],
+        phone = this[Student.phone],
+        orgId = this[Student.orgId]?.value,
+        email = this[Student.email]
+    )

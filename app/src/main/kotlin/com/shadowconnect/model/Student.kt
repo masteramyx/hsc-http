@@ -15,6 +15,6 @@ data class Student(
     val email: String,
     @SerialName("phone")
     val phone: String,
-    @SerialName("organization_id")
+    @SerialName("org_id")
     val orgId: Int? = null
 )
