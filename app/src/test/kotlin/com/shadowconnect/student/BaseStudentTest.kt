@@ -33,9 +33,9 @@ abstract class BaseStudentTest {
     }
 
     val testStudents = listOf<Student>(
-        Student("1", "Kyle", "Franklin", "abc@abc.com"),
-        Student("2", "Kyle", "Franklin", "abc@abc.com"),
-        Student("3", "Kyle", "Franklin", "abc@abc.com")
+        Student(1L, 1L, "Kyle", "Franklin", "abc@abc.com", "555-0123", "STU001", "Computer Science", 3, 3.75, "student", true),
+        Student(2L, 2L, "Kyle", "Franklin", "abc@abc.com", "555-0124", "STU002", "Biology", 2, 3.80, "student", true),
+        Student(3L, 3L, "Kyle", "Franklin", "abc@abc.com", "555-0125", "STU003", "Physics", 4, 3.65, "student", true)
     )
 
 

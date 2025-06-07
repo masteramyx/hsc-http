@@ -97,6 +97,26 @@ The application uses a **role-based user system** with relational database desig
 - **Relationship Enforcement:** Each student/professional must have a user account
 - **Query Efficiency:** JOIN operations to get complete user profiles
 
+### Database Connection Architecture
+
+This application uses **HikariCP DataSource** with **SQLDelight 2.0** for database connectivity, following the [recommended approach from SQLDelight documentation](https://sqldelight.github.io/sqldelight/2.0.2/jvm_postgresql/).
+
+**Why HikariCP DataSource?**
+- **Connection Pooling:** Efficiently manages database connections
+- **Performance:** HikariCP is one of the fastest connection pools available
+- **SQLDelight Integration:** Native support via `.asJdbcDriver()` extension
+- **Production Ready:** Handles connection lifecycle, timeouts, and recovery
+
+**Configuration:**
+```kotlin
+// DatabaseFactory uses HikariCP with these settings:
+maximumPoolSize = 10
+isAutoCommit = false
+transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+```
+
+This approach provides better performance and reliability compared to direct JDBC connections, especially under load.
+
 ## Development Setup
 
 ### Prerequisites

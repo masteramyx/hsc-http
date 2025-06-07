@@ -35,6 +35,8 @@ dependencies {
     implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
     api("app.cash.sqldelight:runtime:2.0.2")
     api("app.cash.sqldelight:jdbc-driver:2.0.2")
+    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("com.zaxxer:HikariCP:5.1.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }

@@ -31,7 +31,7 @@ tasks {
 tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
-    project(":db")
+    implementation(project(":db"))
     implementation(kotlin("stdlib"))
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
