@@ -1,0 +1,82 @@
+CREATE TABLE professional
+(
+    id              SERIAL8 PRIMARY KEY,
+    user_id         BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_name      varchar(100) NOT NULL,
+    last_name       varchar(100) NOT NULL,
+    phone           VARCHAR(15) NOT NULL,
+    license_number  varchar(50) UNIQUE,
+    specialization  varchar(100),
+    years_experience INTEGER,
+    organization    varchar(200),
+    title           varchar(100),
+    bio             TEXT,
+    verified        BOOLEAN     DEFAULT FALSE,
+    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Get professional by ID
+getProfessionalById:
+SELECT p.*, u.email, u.user_type, u.is_active 
+FROM professional p 
+JOIN users u ON p.user_id = u.id 
+WHERE p.id = ?;
+
+-- Get professional by user ID
+getProfessionalByUserId:
+SELECT p.*, u.email, u.user_type, u.is_active 
+FROM professional p 
+JOIN users u ON p.user_id = u.id 
+WHERE p.user_id = ?;
+
+-- Get all active professionals
+getAllActiveProfessionals:
+SELECT p.*, u.email, u.user_type, u.is_active 
+FROM professional p 
+JOIN users u ON p.user_id = u.id 
+WHERE u.is_active = TRUE 
+ORDER BY p.created_at DESC;
+
+-- Get verified professionals
+getVerifiedProfessionals:
+SELECT p.*, u.email, u.user_type, u.is_active 
+FROM professional p 
+JOIN users u ON p.user_id = u.id 
+WHERE u.is_active = TRUE AND p.verified = TRUE 
+ORDER BY p.created_at DESC;
+
+-- Get professionals by specialization
+getProfessionalsBySpecialization:
+SELECT p.*, u.email, u.user_type, u.is_active 
+FROM professional p 
+JOIN users u ON p.user_id = u.id 
+WHERE u.is_active = TRUE AND p.specialization = ? 
+ORDER BY p.years_experience DESC;
+
+-- Create professional
+createProfessional:
+INSERT INTO professional (user_id, first_name, last_name, phone, license_number, specialization, years_experience, organization, title, bio)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Update professional
+updateProfessional:
+UPDATE professional SET 
+    first_name = ?, 
+    last_name = ?, 
+    phone = ?, 
+    license_number = ?,
+    specialization = ?,
+    years_experience = ?,
+    organization = ?,
+    title = ?,
+    bio = ?,
+    updated_at = CURRENT_TIMESTAMP 
+WHERE id = ?;
+
+-- Verify professional
+verifyProfessional:
+UPDATE professional SET 
+    verified = TRUE,
+    updated_at = CURRENT_TIMESTAMP 
+WHERE id = ?;

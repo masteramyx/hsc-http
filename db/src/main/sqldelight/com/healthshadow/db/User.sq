@@ -1,0 +1,44 @@
+CREATE TABLE users
+(
+    id           SERIAL8 PRIMARY KEY,
+    email        varchar(255) NOT NULL UNIQUE,
+    password_hash varchar(255) NOT NULL,
+    user_type    varchar(20)  NOT NULL CHECK (user_type IN ('student', 'professional', 'admin')),
+    created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    is_active    BOOLEAN      DEFAULT TRUE
+);
+
+-- Get user by ID
+getUserById:
+SELECT * FROM users WHERE id = ?;
+
+-- Get user by email
+getUserByEmail:
+SELECT * FROM users WHERE email = ?;
+
+-- Check if email already exists
+isEmailAlreadyExists:
+SELECT id FROM users WHERE email = ?;
+
+-- Create new user
+createUser:
+INSERT INTO users (email, password_hash, user_type)
+VALUES (?, ?, ?)
+RETURNING id;
+
+-- Update user email
+updateUserEmail:
+UPDATE users SET email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- Deactivate user
+deactivateUser:
+UPDATE users SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- Get all active users
+getAllActiveUsers:
+SELECT * FROM users WHERE is_active = TRUE ORDER BY created_at DESC;
+
+-- Get users by type
+getUsersByType:
+SELECT * FROM users WHERE user_type = ? AND is_active = TRUE ORDER BY created_at DESC;

@@ -1,11 +1,54 @@
 CREATE TABLE student
 (
     id         SERIAL8 PRIMARY KEY,
-    first_name varchar     NOT NULL,
-    last_name  varchar     NOT NULL,
-    email      varchar     NOT NULL,
-    phone      VARCHAR(15) NOT NULL
+    user_id    BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_name varchar(100) NOT NULL,
+    last_name  varchar(100) NOT NULL,
+    phone      VARCHAR(15) NOT NULL,
+    student_id varchar(50) UNIQUE,
+    major      varchar(100),
+    year_level INTEGER,
+    gpa        DECIMAL(3,2),
+    created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
-isEmailAlreadyExists:
-SELECT id FROM student WHERE email = ?;
+-- Get student by ID
+getStudentById:
+SELECT s.*, u.email, u.user_type, u.is_active 
+FROM student s 
+JOIN users u ON s.user_id = u.id 
+WHERE s.id = ?;
+
+-- Get student by user ID
+getStudentByUserId:
+SELECT s.*, u.email, u.user_type, u.is_active 
+FROM student s 
+JOIN users u ON s.user_id = u.id 
+WHERE s.user_id = ?;
+
+-- Get all active students
+getAllActiveStudents:
+SELECT s.*, u.email, u.user_type, u.is_active 
+FROM student s 
+JOIN users u ON s.user_id = u.id 
+WHERE u.is_active = TRUE 
+ORDER BY s.created_at DESC;
+
+-- Create student
+createStudent:
+INSERT INTO student (user_id, first_name, last_name, phone, student_id, major, year_level, gpa)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Update student
+updateStudent:
+UPDATE student SET 
+    first_name = ?, 
+    last_name = ?, 
+    phone = ?, 
+    student_id = ?,
+    major = ?,
+    year_level = ?,
+    gpa = ?,
+    updated_at = CURRENT_TIMESTAMP 
+WHERE id = ?;
