@@ -104,6 +104,37 @@ The application uses a **role-based user system** with relational database desig
 - Docker and Docker Compose (for database)
 
 ### Local Development
+
+#### Setup PostgreSQL Database
+```bash
+# Start PostgreSQL container for development
+docker-compose -f docker-compose.dev.yml up -d
+
+# Check container status
+docker-compose -f docker-compose.dev.yml ps
+
+# View PostgreSQL logs (useful for troubleshooting)
+docker-compose -f docker-compose.dev.yml logs postgres
+
+# Stop PostgreSQL when done
+docker-compose -f docker-compose.dev.yml down
+```
+
+**Command Explanation:**
+- `-f docker-compose.dev.yml` = Use this specific file (default is `docker-compose.yml`)
+- `up -d` = Start containers in background (detached mode)
+- `ps` = Show running containers and their status
+- `logs postgres` = Show PostgreSQL startup messages and errors
+- `down` = Stop and remove all containers
+
+**Database Connection:**
+- **Host:** localhost
+- **Port:** 5432
+- **Database:** healthshadow_dev
+- **Username:** hsc_user
+- **Password:** hsc_dev_password
+
+#### Build and Run Application
 ```bash
 # Build and test
 ./gradlew build
