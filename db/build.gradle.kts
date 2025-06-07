@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm")
     java
-    id("com.squareup.sqldelight")
+    id("app.cash.sqldelight")
 }
 
 
@@ -15,10 +15,11 @@ sourceSets {
 
 // Database Configurations
 sqldelight {
-    this.database("HealthShadowDatabase") {
-        packageName = "com.healthshadow.db"
-        dialect = "postgresql"
-        sourceFolders = listOf("sql", "java/com/shadowconnect/db/sql")
+    databases {
+        create("HealthShadowDatabase") {
+            packageName.set("com.healthshadow.db")
+            dialect("app.cash.sqldelight:postgresql-dialect:2.0.2")
+        }
     }
 }
 
@@ -31,10 +32,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.squareup.sqldelight:jdbc-driver:1.5.0")
-    api("com.squareup.sqldelight:runtime:$1.5.3")
-    api("com.squareup.sqldelight:jdbc-driver:$1.5.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
+    api("app.cash.sqldelight:runtime:2.0.2")
+    api("app.cash.sqldelight:jdbc-driver:2.0.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

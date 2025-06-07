@@ -11,7 +11,7 @@ buildscript {
         maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     }
     dependencies {
-        classpath("com.squareup.sqldelight:gradle-plugin:1.5.3")
+        classpath("app.cash.sqldelight:gradle-plugin:2.0.2")
     }
 
 }
@@ -22,8 +22,8 @@ repositories {
 }
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.9.25"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.25"
 }
 
 group = "com.shadowconnect"

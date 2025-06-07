@@ -8,4 +8,4 @@ CREATE TABLE student
 );
 
 isEmailAlreadyExists:
-SELECT id FROM users WHERE email = ?;
+SELECT id FROM student WHERE email = ?;
