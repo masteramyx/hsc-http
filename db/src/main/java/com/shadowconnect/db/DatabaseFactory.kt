@@ -20,7 +20,7 @@ object DatabaseFactory {
             this.password = password
             driverClassName = "org.postgresql.Driver"
             maximumPoolSize = 10
-            isAutoCommit = false
+            isAutoCommit = true
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         }
         
