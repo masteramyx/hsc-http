@@ -9,6 +9,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import com.shadowconnect.utils.logger
 
 fun Route.userRouting() {
     val database = DatabaseFactory.getDatabase()
@@ -21,6 +22,7 @@ fun Route.userRouting() {
          * Return full list of active students
          */
         get {
+            logger.debug("GET /students - Fetching all active students")
             try {
                 val students = studentRepository.getAllActiveStudents().map { studentData ->
                     Student(
@@ -40,11 +42,14 @@ fun Route.userRouting() {
                 }
                 
                 if (students.isNotEmpty()) {
+                    logger.debug("GET /students - Returning ${students.size} students")
                     call.respond(students)
                 } else {
+                    logger.debug("GET /students - No students found")
                     call.respondText("No students found", status = HttpStatusCode.OK)
                 }
             } catch (e: Exception) {
+                logger.error("GET /students - Error fetching students: ${e.message}", e)
                 call.respondText("Error fetching students: ${e.message}", status = HttpStatusCode.InternalServerError)
             }
         }
@@ -63,6 +68,7 @@ fun Route.userRouting() {
                 status = HttpStatusCode.BadRequest
             )
 
+            logger.debug("GET /students/$id - Fetching student by ID")
             try {
                 val studentData = studentRepository.getStudentById(id) ?: return@get call.respondText(
                     "No student with id: $id",
@@ -83,8 +89,10 @@ fun Route.userRouting() {
                     userType = studentData.userType,
                     isActive = studentData.isActive ?: false
                 )
+                logger.debug("GET /students/$id - Student found and returned")
                 call.respond(student)
             } catch (e: Exception) {
+                logger.error("GET /students/$id - Error fetching student: ${e.message}", e)
                 call.respondText("Error fetching student: ${e.message}", status = HttpStatusCode.InternalServerError)
             }
         }
@@ -95,6 +103,7 @@ fun Route.userRouting() {
          * Create a new student
          */
         post {
+            logger.debug("POST /students - Creating new student")
             try {
                 val request: CreateStudentRequest = call.receive()
                 val success = studentRepository.createStudent(
@@ -109,11 +118,14 @@ fun Route.userRouting() {
                 )
                 
                 if (success) {
+                    logger.info("POST /students - Student created successfully")
                     call.respondText("Student created successfully", status = HttpStatusCode.Created)
                 } else {
+                    logger.warn("POST /students - Failed to create student")
                     call.respondText("Failed to create student", status = HttpStatusCode.InternalServerError)
                 }
             } catch (e: Exception) {
+                logger.error("POST /students - Error creating student: ${e.message}", e)
                 call.respondText("Error creating student: ${e.message}", status = HttpStatusCode.BadRequest)
             }
         }

@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     java
-    id("app.cash.sqldelight")
+    alias(libs.plugins.sqldelight)
 }
 
 
@@ -31,14 +31,14 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    implementation("app.cash.sqldelight:jdbc-driver:2.0.2")
-    api("app.cash.sqldelight:runtime:2.0.2")
-    api("app.cash.sqldelight:jdbc-driver:2.0.2")
-    implementation("org.postgresql:postgresql:42.7.4")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.sqldelight.jdbc.driver)
+    api(libs.sqldelight.runtime)
+    api(libs.sqldelight.jdbc.driver)
+    implementation(libs.postgresql.driver)
+    implementation(libs.hikaricp)
+    testImplementation(libs.junit.jupiter.api.db)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 tasks.getByName<Test>("test") {

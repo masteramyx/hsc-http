@@ -1,13 +1,7 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
-val mockk_version: String by project
-val sql_delight_version: String by project
-
 plugins {
     application
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 application {
@@ -32,18 +26,18 @@ tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
     implementation(project(":db"))
-    implementation(kotlin("stdlib"))
-    implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("io.ktor:ktor-client-mock:$ktor_version")
-    testImplementation("io.mockk:mockk:$mockk_version")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.logback.classic)
+    testImplementation(libs.ktor.server.tests)
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.mockk)
+    testImplementation(libs.junit.jupiter.api.app)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 tasks.getByName<Test>("test") {
