@@ -1,0 +1,24 @@
+# Build artifacts
+build/
+*/build/
+.gradle/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+CLAUDE.md
+
+# Local files
+local.properties
+
+# Docker files
+docker-compose*.yml
+Dockerfile
