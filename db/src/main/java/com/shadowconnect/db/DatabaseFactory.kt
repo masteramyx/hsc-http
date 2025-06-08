@@ -10,9 +10,9 @@ object DatabaseFactory {
     private var dataSource: HikariDataSource? = null
 
     fun init(
-        databaseUrl: String = "jdbc:postgresql://localhost:5432/healthshadow_dev",
-        username: String = "hsc_user",
-        password: String = "hsc_dev_password"
+        databaseUrl: String = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://localhost:5432/healthshadow_dev",
+        username: String = System.getenv("DATABASE_USER") ?: "hsc_user",
+        password: String = System.getenv("DATABASE_PASSWORD") ?: "hsc_dev_password"
     ) {
         val config = HikariConfig().apply {
             jdbcUrl = databaseUrl

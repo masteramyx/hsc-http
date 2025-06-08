@@ -19,6 +19,19 @@ services:
       timeout: 5s
       retries: 5
 
+  app:
+    image: hsc-http:latest
+    container_name: hsc-app-dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/healthshadow_dev
+      - DATABASE_USER=hsc_user
+      - DATABASE_PASSWORD=hsc_dev_password
+      - HOST=0.0.0.0
+
 volumes:
   postgres_data:
     driver: local
