@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v3.0
+    container_name: hsc-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"       # HTTP
+      - "443:443"     # HTTPS
+      - "8081:8080"   # Traefik dashboard
+    volumes:
+      # Docker socket access for automatic service discovery
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Traefik configuration file
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      # Let's Encrypt certificate storage
+      - traefik-acme:/acme
+    # Traefik labels for configuring its own dashboard
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+
   postgres:
     image: postgres:15
     container_name: hsc-postgres-dev
@@ -31,7 +52,18 @@ services:
       - DATABASE_USER=hsc_user
       - DATABASE_PASSWORD=hsc_dev_password
       - HOST=0.0.0.0
+    # Traefik labels for automatic service discovery and routing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hsc-app.rule=Host(`${DOMAIN:-hsc-http.localhost}`)"
+      - "traefik.http.routers.hsc-app.entrypoints=websecure"
+      - "traefik.http.routers.hsc-app.tls.certresolver=letsencrypt"
+      - "traefik.http.services.hsc-app.loadbalancer.server.port=8080"
 
 volumes:
   postgres_data:
     driver: local
+  # Let's Encrypt certificate storage for automatic SSL
+  traefik-acme:
+    driver: local
+

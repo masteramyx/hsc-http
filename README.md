@@ -19,10 +19,13 @@ This application uses a **single-server Docker Compose setup** for self-hosting:
 Internet
     ↓
 Your Home Server
-├── Reverse Proxy Container (nginx/traefik)
-│   ├── Handles SSL/HTTPS certificates
-│   ├── Routes traffic to application
+├── Traefik Reverse Proxy Container
+│   ├── Automatic SSL/HTTPS with Let's Encrypt
+│   ├── Routes traffic to application containers
+│   ├── Service discovery via Docker labels*
 │   └── Serves on ports 80/443
+
+*Service Discovery: Traefik automatically finds containers by reading their Docker labels, eliminating the need for manual configuration files
 ├── Application Container (Ktor)
 │   ├── Runs on internal port 8080
 │   └── Only accessible through proxy
@@ -117,6 +120,104 @@ transactionIsolation = "TRANSACTION_REPEATABLE_READ"
 
 This approach provides better performance and reliability compared to direct JDBC connections, especially under load.
 
+## Traefik Reverse Proxy
+
+### What is Traefik?
+
+Traefik is a modern reverse proxy that automatically discovers and routes traffic to your Docker containers. Unlike traditional proxies (nginx, Apache), Traefik requires **zero manual configuration** - it reads Docker labels to understand how to route traffic.
+
+### Why Traefik for Self-Hosting?
+
+**Automatic Configuration:**
+- No editing config files when adding/removing services
+- Containers declare their own routing rules via labels
+- Dynamic updates without proxy restarts
+
+**Built-in SSL/HTTPS:**
+- Automatic Let's Encrypt certificate provisioning
+- Certificate renewal handled automatically
+- HTTPS redirects configured by default
+
+**Docker Integration:**
+- Reads Docker socket to discover containers
+- Understands Docker networks and service names
+- Works seamlessly with Docker Compose
+
+### How It Works in This Project
+
+**Container Labels Define Routing:**
+```yaml
+app:
+  labels:
+    - "traefik.enable=true"                                    # Make this container discoverable
+    - "traefik.http.routers.hsc-app.rule=Host(`myapp.com`)"   # Route myapp.com to this container
+    - "traefik.http.routers.hsc-app.entrypoints=websecure"    # Use HTTPS (port 443)
+    - "traefik.http.routers.hsc-app.tls.certresolver=letsencrypt" # Get SSL cert from Let's Encrypt
+    - "traefik.http.services.hsc-app.loadbalancer.server.port=8080" # Container listens on port 8080
+```
+
+**Traffic Flow:**
+```
+User: https://myapp.com
+  ↓
+Traefik: Reads Host header, finds matching container label
+  ↓ 
+Traefik: Routes to hsc-app container on port 8080
+  ↓
+App: Processes request, returns response
+  ↓
+Traefik: Returns HTTPS response with auto-managed SSL certificate
+```
+
+### Traefik Configuration Files
+
+The project requires one static configuration file to enable Docker discovery and SSL:
+
+**`traefik/traefik.yml`** - Main configuration
+- Enables Docker provider for service discovery
+- Configures Let's Encrypt for automatic SSL certificates
+- Sets up entrypoints (HTTP port 80, HTTPS port 443)
+
+### Important Commands
+
+```bash
+# Start full stack with Traefik
+docker-compose up -d
+
+# View Traefik dashboard (shows discovered services)
+open http://localhost:8081
+
+# Check Traefik logs (useful for SSL certificate issues)
+docker logs hsc-traefik
+
+# Test SSL certificate provisioning
+curl -v https://yourdomain.com
+
+# Force SSL certificate renewal (if needed)
+docker exec hsc-traefik rm /acme/acme.json
+docker restart hsc-traefik
+```
+
+### Environment Variables
+
+**Required for Production:**
+- `DOMAIN=yourdomain.com` - Your actual domain name
+- `POSTGRES_PASSWORD=secure_password` - Database password
+
+**Local Development:**
+- Uses `localhost` defaults for testing
+- SSL disabled for local development
+
+### SSL Certificate Storage
+
+Traefik stores Let's Encrypt certificates in a Docker volume:
+```yaml
+volumes:
+  traefik-acme:  # Persistent storage for SSL certificates
+```
+
+**Important:** This volume persists certificates across container restarts. Losing this volume means re-requesting certificates from Let's Encrypt (rate limited).
+
 ## Development Setup
 
 ### Prerequisites
@@ -165,7 +266,36 @@ docker-compose -f docker-compose.dev.yml down
 # Application runs on http://localhost:8080
 ```
 
+### Container Management
+
+**Rebuild and Restart Containers:**
+```bash
+# Most common - rebuild image and recreate all containers
+docker-compose -f docker-compose.dev.yml up -d --build
+
+# Alternative: rebuild image first, then recreate
+docker build -t hsc-http . && docker-compose -f docker-compose.dev.yml up -d --force-recreate
+
+# Force recreate without rebuilding image (use existing image)
+docker-compose -f docker-compose.dev.yml up -d --force-recreate
+
+# Recreate specific service only
+docker-compose -f docker-compose.dev.yml up -d --force-recreate app
+
+# Nuclear option - stop, remove everything, rebuild, restart
+docker-compose -f docker-compose.dev.yml down
+docker build -t hsc-http .
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+**When to Use:**
+- `--build` - When you've changed application code
+- `--force-recreate` - When you've changed docker-compose.yml configuration
+- Both - When you've changed both code and configuration
+
 ### Testing the API
+
+**Direct Access (Bypasses Traefik):**
 ```bash
 # Test root endpoint
 curl http://localhost:8080/
@@ -173,10 +303,22 @@ curl http://localhost:8080/
 # Get all students  
 curl http://localhost:8080/students
 
-# Add a student (currently uses in-memory storage)
+# Add a student
 curl -X POST http://localhost:8080/students \
   -H "Content-Type: application/json" \
   -d '{"id":"1","firstName":"John","lastName":"Doe","email":"john@example.com","phone":"555-1234"}'
+```
+
+**Through Traefik (Production-like):**
+```bash
+# Test HTTPS access (ignores SSL certificate warnings)
+curl -k -H "Host: hsc-http.localhost" https://localhost/
+
+# Test HTTP redirect (should return 301 redirect)
+curl -H "Host: hsc-http.localhost" http://localhost/
+
+# Test API endpoints through Traefik
+curl -k -H "Host: hsc-http.localhost" https://localhost/students
 ```
 
 ## Deployment

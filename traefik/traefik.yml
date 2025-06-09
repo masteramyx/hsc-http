@@ -1,0 +1,36 @@
+# Traefik static configuration
+# This file configures Traefik's core functionality and service discovery
+
+# API and Dashboard configuration
+api:
+  dashboard: true  # Enable the web dashboard
+  insecure: true   # Allow dashboard access without authentication (development only)
+
+# Entry points - where Traefik listens for incoming traffic
+entryPoints:
+  web:
+    address: ":80"    # HTTP traffic
+    http:
+      redirections:
+        entrypoint:
+          to: websecure                      # Redirect all HTTP to HTTPS
+          scheme: https
+  websecure:
+    address: ":443"   # HTTPS traffic
+
+# Service providers - how Traefik discovers services
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"  # Docker socket for service discovery
+    exposedByDefault: false                  # Only expose containers with traefik.enable=true
+
+# Certificate resolvers - automatic SSL certificate management
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # TODO: Change this to your actual email address for Let's Encrypt notifications
+      email: admin@example.com               
+      storage: /acme/acme.json               # Certificate storage location
+      httpChallenge:
+        entryPoint: web                      # Use HTTP challenge for certificate validation
+
