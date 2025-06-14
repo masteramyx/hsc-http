@@ -37,3 +37,10 @@ out/
 
 ### Claude Code ###
 CLAUDE.md
+
+### Environment files with secrets ###
+.env.local
+.env.production
+
+### Logs ###
+*.log
