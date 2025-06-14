@@ -55,7 +55,7 @@ services:
     # Traefik labels for automatic service discovery and routing
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hsc-app.rule=Host(`${DOMAIN:-hsc-http.localhost}`)"
+      - "traefik.http.routers.hsc-app.rule=Host(`${DOMAIN:-shadowconnects.localhost}`)"
       - "traefik.http.routers.hsc-app.entrypoints=websecure"
       - "traefik.http.routers.hsc-app.tls.certresolver=letsencrypt"
       - "traefik.http.services.hsc-app.loadbalancer.server.port=8080"

@@ -28,8 +28,8 @@ providers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      # TODO: Change this to your actual email address for Let's Encrypt notifications
-      email: admin@example.com               
+      # Let's Encrypt notification email
+      email: masteramyx@gmail.com               
       storage: /acme/acme.json               # Certificate storage location
       httpChallenge:
         entryPoint: web                      # Use HTTP challenge for certificate validation
