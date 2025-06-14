@@ -52,6 +52,19 @@ services:
       - DATABASE_USER=hsc_user
       - DATABASE_PASSWORD=hsc_dev_password
       - HOST=0.0.0.0
+    # Centralized logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     # Traefik labels for automatic service discovery and routing
     labels:
       - "traefik.enable=true"
