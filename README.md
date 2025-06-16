@@ -356,20 +356,105 @@ curl -k -H "Host: hsc-http.localhost" https://localhost/students
 
 ## Future Development
 
-**Authentication System:**
+### Platform Expansion (Multi-Service Architecture)
+
+One of the key advantages of this Traefik-based setup is the ability to host **multiple services** for the HealthShadow platform on the same server using different subdomains. Each service gets its own SSL certificate and container, while sharing the same infrastructure.
+
+**How Multi-Service Hosting Works:**
+
+The HTTP `Host` header identifies which service each request is intended for:
+```
+User Request: https://api.shadowconnects.com
+├── DNS resolves to: 73.43.190.195 (your home IP)
+├── Router forwards: Port 443 → Server:443
+├── Traefik reads: Host: api.shadowconnects.com
+└── Routes to: API container based on Docker labels
+```
+
+**Potential Services Architecture:**
+```yaml
+# Main API (Current)
+api.shadowconnects.com → Kotlin/Ktor REST API
+
+# Frontend Application  
+app.shadowconnects.com → React/Vue.js SPA
+
+# Admin Dashboard
+admin.shadowconnects.com → Admin interface
+
+# Student Portal
+student.shadowconnects.com → Student-specific features
+
+# Professional Portal  
+professional.shadowconnects.com → Healthcare professional tools
+
+# Documentation/Help
+docs.shadowconnects.com → API documentation, user guides
+
+# File Storage
+files.shadowconnects.com → Document/image upload service
+
+# Real-time Features
+ws.shadowconnects.com → WebSocket server for chat/notifications
+
+# Analytics Dashboard
+analytics.shadowconnects.com → Usage metrics, reporting
+```
+
+**Implementation Example:**
+```yaml
+# docker-compose.yml - Multiple services
+services:
+  # Current API service
+  api:
+    labels:
+      - "traefik.http.routers.api.rule=Host(`api.shadowconnects.com`)"
+      
+  # Frontend application
+  frontend:
+    image: nginx:alpine
+    labels:
+      - "traefik.http.routers.frontend.rule=Host(`app.shadowconnects.com`)"
+      
+  # Admin dashboard
+  admin:
+    image: admin-dashboard:latest
+    labels:
+      - "traefik.http.routers.admin.rule=Host(`admin.shadowconnects.com`)"
+```
+
+**Benefits of This Architecture:**
+- **Single IP Address:** All services use the same public IP (73.43.190.195)
+- **Automatic SSL:** Each subdomain gets its own Let's Encrypt certificate
+- **Independent Deployment:** Services can be updated/restarted independently
+- **Resource Efficiency:** Shared database, shared reverse proxy
+- **Easy Scaling:** Add new services by adding containers + labels
+- **Professional Appearance:** Clean subdomain structure
+
+**Future Service Ideas:**
+- **Matching Service:** Algorithm to connect students with professionals
+- **Scheduling System:** Appointment booking and calendar management  
+- **Communication Platform:** Secure messaging between users
+- **Content Management:** Educational resources and documentation
+- **Payment Processing:** Subscription management for premium features
+- **Mobile API Gateway:** Specialized endpoints for mobile applications
+
+This architecture allows the HealthShadow platform to grow organically - start with the core API, then add specialized services as user needs become clear.
+
+### Authentication System
 - Password hashing (bcrypt)
 - JWT token management
 - Login/logout endpoints
 - Session management
 - Route protection middleware
 
-**API Enhancements:**
+### API Enhancements
 - User registration/authentication endpoints
 - Role-based access control
 - Professional verification workflow
 - Student-professional matching system
 
-**Infrastructure:**
+### Infrastructure
 - Automated backups
 - Monitoring and logging
 - CI/CD pipeline
