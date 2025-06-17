@@ -463,12 +463,29 @@ This architecture allows the HealthShadow platform to grow organically - start w
 - Health checks
 - Code linting and formatting (ktlint)
 
+## Testing Strategy
+
+This project follows industry-standard testing practices with clear separation of concerns:
+
+**Unit Tests** - Test single components in isolation, no external dependencies
+- Pure unit tests: Zero dependencies (e.g., validation logic)
+- Unit tests with mocks: Isolated business logic with mocked dependencies
+
+**Integration Tests** - Test components working together with external dependencies
+- Repository tests: Use in-memory H2 database for fast, isolated database testing
+- End-to-end tests: Full application flow testing
+
+**Current Test Coverage:**
+- ✅ Authentication layer: Password validation, auth service, user repository
+- 📋 Planned: Route handlers, session management, full auth flow
+
 ## Contributing
 
 1. Ensure tests pass: `./gradlew test`
 2. Follow existing code conventions
-3. Update this README for architectural changes
-4. Commit messages should be descriptive and concise
+3. Write tests for new functionality (unit tests preferred)
+4. Update this README for architectural changes
+5. Commit messages should be descriptive and concise
 
 ## Configuration
 
