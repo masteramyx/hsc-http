@@ -3,6 +3,8 @@ kotlin = "1.9.25"
 ktor = "2.3.12"
 logback = "1.4.14"
 mockk = "1.13.12"
+bcrypt = "0.10.2"
+coroutines = "1.7.3"
 sqldelight = "2.0.2"
 postgresql = "42.7.4"
 hikaricp = "5.1.0"
@@ -17,6 +19,8 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-sessions = { module = "io.ktor:ktor-server-sessions-jvm", version.ref = "ktor" }
+ktor-server-html-builder = { module = "io.ktor:ktor-server-html-builder-jvm", version.ref = "ktor" }
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
@@ -26,6 +30,8 @@ sqldelight-jdbc-driver = { module = "app.cash.sqldelight:jdbc-driver", version.r
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
 postgresql-driver = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 junit-jupiter-api-app = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-app" }

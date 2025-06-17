@@ -37,6 +37,7 @@ dependencies {
     api(libs.sqldelight.jdbc.driver)
     implementation(libs.postgresql.driver)
     implementation(libs.hikaricp)
+    implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit.jupiter.api.db)
     testRuntimeOnly(libs.junit.jupiter.engine)
 }
