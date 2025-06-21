@@ -4,6 +4,11 @@ plugins {
     alias(libs.plugins.sqldelight)
 }
 
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
 
 sourceSets {
     // This is because SQLDelight finds resources in `src/main` path.
