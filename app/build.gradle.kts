@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.sessions)
+    implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.html.builder)
     implementation(libs.bcrypt)
     implementation(libs.logback.classic)

@@ -1,0 +1,136 @@
+package com.shadowconnect.routes
+
+import com.shadowconnect.auth.AuthService
+import com.shadowconnect.auth.UserSession
+import com.shadowconnect.db.DatabaseFactory
+import com.shadowconnect.db.UserRepositoryImpl
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LoginRequest(val email: String, val password: String)
+
+@Serializable
+data class LoginResponse(val success: Boolean, val message: String, val user: UserInfo? = null)
+
+@Serializable
+data class UserInfo(val id: Long, val email: String, val userType: String)
+
+fun Route.authRouting() {
+    val database = DatabaseFactory.getDatabase()
+    val userRepository = UserRepositoryImpl(database)
+    val authService = AuthService(userRepository)
+
+    // Public auth endpoints
+    post("/login") {
+        try {
+            val loginRequest = call.receive<LoginRequest>()
+            val user = authService.authenticateUser(loginRequest.email, loginRequest.password)
+            
+            if (user != null) {
+                // Create session
+                val session = UserSession(
+                    userId = user.id,
+                    email = user.email,
+                    userType = user.user_type
+                )
+                call.sessions.set(session)
+                
+                call.respond(
+                    HttpStatusCode.OK,
+                    LoginResponse(
+                        success = true,
+                        message = "Login successful",
+                        user = UserInfo(user.id, user.email, user.user_type)
+                    )
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    LoginResponse(success = false, message = "Invalid email or password")
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.BadRequest,
+                LoginResponse(success = false, message = "Invalid request format")
+            )
+        }
+    }
+
+    // Protected endpoints requiring authentication
+    authenticate("session-auth") {
+        post("/logout") {
+            call.sessions.clear<UserSession>()
+            call.respond(
+                HttpStatusCode.OK,
+                LoginResponse(success = true, message = "Logged out successfully")
+            )
+        }
+
+        get("/me") {
+            val session = call.sessions.get<UserSession>()
+            if (session != null) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    LoginResponse(
+                        success = true,
+                        message = "Authenticated",
+                        user = UserInfo(session.userId, session.email, session.userType)
+                    )
+                )
+            } else {
+                // This shouldn't happen due to authenticate block, but handle gracefully
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    LoginResponse(success = false, message = "Session invalid")
+                )
+            }
+        }
+
+        get("/api/protected") {
+            val session = call.sessions.get<UserSession>()
+            if (session != null) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    mapOf(
+                        "message" to "Welcome to the protected area!",
+                        "user" to session.email,
+                        "timestamp" to java.time.Instant.now().toString()
+                    )
+                )
+            } else {
+                // Fallback - shouldn't happen due to authenticate block
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    mapOf("error" to "Session invalid")
+                )
+            }
+        }
+        
+        get("/api/profile") {
+            val session = call.sessions.get<UserSession>()
+            if (session != null) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    mapOf(
+                        "id" to session.userId,
+                        "email" to session.email,
+                        "userType" to session.userType
+                    )
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    mapOf("error" to "Session invalid")
+                )
+            }
+        }
+    }
+}

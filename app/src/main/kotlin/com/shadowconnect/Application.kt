@@ -4,6 +4,9 @@ import io.ktor.server.application.*
 import com.shadowconnect.plugins.*
 import com.shadowconnect.db.DatabaseFactory
 import com.shadowconnect.utils.logger
+import io.ktor.server.auth.*
+import io.ktor.server.sessions.*
+import com.shadowconnect.auth.UserSession
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
@@ -16,6 +19,8 @@ fun Application.module() {
     DatabaseFactory.init()
     logger.info("Database initialized successfully")
     
+    configureSessions()
+    configureAuthentication()
     configureRouting()
     configureSerialization()
     
