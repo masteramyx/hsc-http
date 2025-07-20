@@ -26,6 +26,7 @@ tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
     implementation(project(":db"))
+    implementation(project(":shared"))
     implementation(libs.kotlin.stdlib)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.content.negotiation)

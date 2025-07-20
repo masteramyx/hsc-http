@@ -4,6 +4,9 @@ import com.shadowconnect.auth.AuthService
 import com.shadowconnect.auth.UserSession
 import com.shadowconnect.db.DatabaseFactory
 import com.shadowconnect.db.UserRepositoryImpl
+import com.shadowconnect.shared.model.LoginRequest
+import com.shadowconnect.shared.model.LoginResponse
+import com.shadowconnect.shared.model.UserInfo
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -11,16 +14,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class LoginRequest(val email: String, val password: String)
-
-@Serializable
-data class LoginResponse(val success: Boolean, val message: String, val user: UserInfo? = null)
-
-@Serializable
-data class UserInfo(val id: Long, val email: String, val userType: String)
 
 fun Route.authRouting() {
     val database = DatabaseFactory.getDatabase()
