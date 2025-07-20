@@ -7,6 +7,8 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.http.content.*
+import java.io.File
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,9 +26,13 @@ fun Application.configureRouting() {
         userRouting()
         authRouting()
         
+        // Serve the web frontend index page
         get("/") {
-            call.respondText("Hello World!")
+            call.respondFile(File("../web/build/dist/js/productionExecutable/index.html"))
         }
+        
+        // Serve JS and other static files 
+        staticFiles("/static", File("../web/build/dist/js/productionExecutable"))
         
         get("/health") {
             try {
