@@ -2,7 +2,7 @@ import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.css.*
-import com.shadowconnect.shared.auth.LoginRequest
+import com.shadowconnect.shared.model.LoginRequest
 
 @Composable
 fun LoginForm() {
@@ -83,7 +83,9 @@ fun LoginForm() {
             
             Button(attrs = {
                 type(ButtonType.Submit)
-                disabled(isLoading || email.isBlank() || password.isBlank())
+                if (isLoading || email.isBlank() || password.isBlank()) {
+                    disabled()
+                }
                 style {
                     padding(12.px, 24.px)
                     backgroundColor(Color("#007bff"))

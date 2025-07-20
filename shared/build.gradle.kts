@@ -21,7 +21,7 @@ kotlin {
         }
         
         commonTest.dependencies {
-            implementation(libs.kotlin.test.junit)
+            implementation(kotlin("test"))
         }
     }
 }
