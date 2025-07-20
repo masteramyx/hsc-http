@@ -10,10 +10,3 @@ data class LoginResponse(val success: Boolean, val message: String, val user: Us
 
 @Serializable
 data class UserInfo(val id: Long, val email: String, val userType: String)
-
-@Serializable
-data class UserSession(
-    val userId: Long,
-    val email: String,
-    val userType: String
-)
