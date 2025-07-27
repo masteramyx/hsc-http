@@ -497,3 +497,79 @@ This project follows industry-standard testing practices with clear separation o
 ### Application Configuration
 - **Local Development:** `app/src/main/resources/application.conf`
 - **Production:** Environment variables override configuration
+
+## Development DB Commands
+
+### Connect to PostgreSQL Database
+
+```bash
+# Connect to development database
+docker exec -it hsc-postgres psql -U hsc_user -d healthshadow_dev
+
+# Alternative: Connect from host machine (if psql installed locally)
+psql -h localhost -p 5432 -U hsc_user -d healthshadow_dev
+```
+
+### Common PostgreSQL Commands
+
+**View Tables:**
+```sql
+-- List all tables
+\dt
+
+-- Show table structure
+\d users
+\d student
+\d professional
+
+-- Show all columns with types
+\d+ users
+```
+
+**Query Tables:**
+```sql
+-- View all users (shows test logins)
+SELECT id, email, user_type, is_active, created_at FROM users;
+
+-- View students with user info
+SELECT u.email, u.user_type, s.first_name, s.last_name, s.major 
+FROM users u 
+JOIN student s ON u.id = s.user_id;
+
+-- View professionals with user info
+SELECT u.email, u.user_type, p.first_name, p.last_name, p.specialization 
+FROM users u 
+JOIN professional p ON u.id = p.user_id;
+```
+
+**Update Entries:**
+```sql
+-- Update user password (use actual bcrypt hash)
+UPDATE users SET password_hash = '$2a$10$actual.bcrypt.hash.here' WHERE email = 'student@example.com';
+
+-- Activate/deactivate user
+UPDATE users SET is_active = false WHERE email = 'student@example.com';
+UPDATE users SET is_active = true WHERE email = 'student@example.com';
+
+-- Update student info
+UPDATE student SET gpa = 3.85, year_level = 4 WHERE user_id = 1;
+
+-- Verify professional
+UPDATE professional SET verified = true WHERE user_id = 2;
+```
+
+**Exit Database:**
+```sql
+-- Exit psql
+\q
+```
+
+### Test Login Credentials
+
+The database is initialized with these test accounts (passwords need proper bcrypt hashing):
+
+- **Student:** `student@example.com` 
+- **Professional:** `professional@example.com`
+- **Admin:** `admin@example.com`
+
+**Note:** Current passwords are placeholder `TODO_IMPLEMENT_PASSWORD_HASHING` - you'll need to update them with actual bcrypt-hashed passwords for testing.
