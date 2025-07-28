@@ -20,12 +20,14 @@ COPY gradle/libs.versions.toml gradle/
 # Copy source code
 COPY app/ app/
 COPY db/ db/
+COPY shared/ shared/
+COPY web/ web/
 
 # Make gradlew executable
 RUN chmod +x ./gradlew
 
-# Build the application
-RUN ./gradlew build --no-daemon
+# Build only the server components (app, db, shared)
+RUN ./gradlew :app:build :db:build :shared:build --no-daemon
 
 # Expose port 8080
 EXPOSE 8080
