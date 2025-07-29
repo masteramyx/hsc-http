@@ -27,7 +27,7 @@ COPY web/ web/
 RUN chmod +x ./gradlew
 
 # Build only the server components (app, db, shared)
-RUN ./gradlew :app:build :db:build :shared:build --no-daemon
+RUN ./gradlew :app:build :db:build :shared:build :web:build --no-daemon
 
 # Expose port 8080
 EXPOSE 8080

@@ -28,11 +28,11 @@ fun Application.configureRouting() {
         
         // Serve the web frontend index page
         get("/") {
-            call.respondFile(File("../web/build/dist/js/productionExecutable/index.html"))
+            call.respondFile(File("/app/web/build/processedResources/js/main/index.html"))
         }
         
         // Serve JS and other static files 
-        staticFiles("/static", File("../web/build/dist/js/productionExecutable"))
+        staticFiles("/static", File("/app/web/build/kotlin-webpack/js/productionExecutable"))
         
         get("/health") {
             try {
