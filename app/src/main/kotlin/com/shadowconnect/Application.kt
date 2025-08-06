@@ -21,6 +21,7 @@ fun Application.module() {
     
     configureSessions()
     configureAuthentication()
+    configureCORS()
     configureRouting()
     configureSerialization()
     
