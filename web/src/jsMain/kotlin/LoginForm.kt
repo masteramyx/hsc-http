@@ -2,14 +2,16 @@ import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.css.*
-import com.shadowconnect.shared.model.LoginRequest
+import kotlinx.coroutines.launch
+import com.shadowconnect.shared.model.UserInfo
 
 @Composable
-fun LoginForm() {
+fun LoginForm(onLoginSuccess: (UserInfo) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     Form(attrs = {
         onSubmit { event ->
@@ -17,9 +19,23 @@ fun LoginForm() {
             isLoading = true
             errorMessage = null
             
-            // TODO: Implement HTTP client call to /login
-            val loginRequest = LoginRequest(email, password)
-            console.log("Login attempt: ${loginRequest.email}")
+            coroutineScope.launch {
+                try {
+                    val response = ApiClient.login(email, password)
+                    if (response.success && response.user != null) {
+                        val user = response.user!!
+                        onLoginSuccess(user)
+                        console.log("Login successful: ${user.email}")
+                    } else {
+                        errorMessage = response.message
+                    }
+                } catch (e: Exception) {
+                    errorMessage = "Network error: Unable to connect to server"
+                    console.error("Login error:", e)
+                } finally {
+                    isLoading = false
+                }
+            }
         }
     }) {
         Div(attrs = {
