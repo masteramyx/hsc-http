@@ -572,4 +572,4 @@ The database is initialized with these test accounts (passwords need proper bcry
 - **Professional:** `professional@example.com`
 - **Admin:** `admin@example.com`
 
-**Note:** Current passwords are placeholder `TODO_IMPLEMENT_PASSWORD_HASHING` - you'll need to update them with actual bcrypt-hashed passwords for testing.
+passwords are all "password"
