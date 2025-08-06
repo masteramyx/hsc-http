@@ -26,13 +26,23 @@ fun Application.configureRouting() {
         userRouting()
         authRouting()
         
-        // Serve the web frontend index page
+        // This logic handles serving the correct frontend files for different environments.
+        // When running in a Docker container, it serves the production build.
+        // When running locally for development, it serves the development build.
         get("/") {
-            call.respondFile(File("/app/web/build/processedResources/js/main/index.html"))
+            val dockerPath = File("/app/web/build/processedResources/js/main/index.html")
+            val localPath = File("../web/build/processedResources/js/main/index.html")
+            val indexFile = if (dockerPath.exists()) dockerPath else localPath
+            call.respondFile(indexFile)
         }
         
-        // Serve JS and other static files 
-        staticFiles("/static", File("/app/web/build/kotlin-webpack/js/productionExecutable"))
+        // Serve the compiled JavaScript and other static assets.
+        // It checks for the production path first (for Docker) and falls back to the
+        // development path for local runs.
+        val dockerStaticPath = File("/app/web/build/kotlin-webpack/js/productionExecutable")
+        val localStaticPath = File("../web/build/kotlin-webpack/js/developmentExecutable")
+        val staticPath = if (dockerStaticPath.exists()) dockerStaticPath else localStaticPath
+        staticFiles("/static", staticPath)
         
         get("/health") {
             try {
