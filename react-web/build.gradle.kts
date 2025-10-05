@@ -15,7 +15,6 @@ tasks {
     val npmInstall by existing(com.github.gradle.node.npm.task.NpmTask::class) {
         args.set(listOf("install"))
         inputs.file("package.json")
-        inputs.file("package-lock.json")
         outputs.dir("node_modules")
     }
 
