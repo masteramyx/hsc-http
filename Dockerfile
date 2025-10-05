@@ -22,12 +22,13 @@ COPY app/ app/
 COPY db/ db/
 COPY shared/ shared/
 COPY web/ web/
+COPY react-web/ react-web/
 
 # Make gradlew executable
 RUN chmod +x ./gradlew
 
-# Build only the server components (app, db, shared)
-RUN ./gradlew :app:build :db:build :shared:build :web:build --no-daemon
+# Build the backend and React frontend
+RUN ./gradlew :app:build :db:build :shared:build :react-web:assemble --no-daemon
 
 # Expose port 8080
 EXPOSE 8080

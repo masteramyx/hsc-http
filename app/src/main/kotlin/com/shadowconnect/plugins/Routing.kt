@@ -27,22 +27,44 @@ fun Application.configureRouting() {
         authRouting()
         
         // This logic handles serving the correct frontend files for different environments.
+        // Priority: React frontend > Compose Web frontend
         // When running in a Docker container, it serves the production build.
         // When running locally for development, it serves the development build.
         get("/") {
-            val dockerPath = File("/app/web/build/processedResources/js/main/index.html")
-            val localPath = File("../web/build/processedResources/js/main/index.html")
-            val indexFile = if (dockerPath.exists()) dockerPath else localPath
+            // Check for React build first
+            val reactDockerPath = File("/app/react-web/build/index.html")
+            val reactLocalPath = File("../react-web/build/index.html")
+
+            // Fallback to Compose Web
+            val composeDockerPath = File("/app/web/build/processedResources/js/main/index.html")
+            val composeLocalPath = File("../web/build/processedResources/js/main/index.html")
+
+            val indexFile = when {
+                reactDockerPath.exists() -> reactDockerPath
+                reactLocalPath.exists() -> reactLocalPath
+                composeDockerPath.exists() -> composeDockerPath
+                else -> composeLocalPath
+            }
             call.respondFile(indexFile)
         }
-        
-        // Serve the compiled JavaScript and other static assets.
+
+        // Serve React static assets (Vite build output)
+        val reactDockerStaticPath = File("/app/react-web/build/assets")
+        val reactLocalStaticPath = File("../react-web/build/assets")
+        if (reactDockerStaticPath.exists() || reactLocalStaticPath.exists()) {
+            val reactStaticPath = if (reactDockerStaticPath.exists()) reactDockerStaticPath else reactLocalStaticPath
+            staticFiles("/assets", reactStaticPath)
+        }
+
+        // Serve the Compose Web compiled JavaScript and other static assets.
         // It checks for the production path first (for Docker) and falls back to the
         // development path for local runs.
-        val dockerStaticPath = File("/app/web/build/kotlin-webpack/js/productionExecutable")
-        val localStaticPath = File("../web/build/kotlin-webpack/js/developmentExecutable")
-        val staticPath = if (dockerStaticPath.exists()) dockerStaticPath else localStaticPath
-        staticFiles("/static", staticPath)
+        val composeDockerStaticPath = File("/app/web/build/kotlin-webpack/js/productionExecutable")
+        val composeLocalStaticPath = File("../web/build/kotlin-webpack/js/developmentExecutable")
+        if (composeDockerStaticPath.exists() || composeLocalStaticPath.exists()) {
+            val composeStaticPath = if (composeDockerStaticPath.exists()) composeDockerStaticPath else composeLocalStaticPath
+            staticFiles("/static", composeStaticPath)
+        }
         
         get("/health") {
             try {
