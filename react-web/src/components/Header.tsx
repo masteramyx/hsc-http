@@ -5,22 +5,22 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">H</span>
+              <span className="text-white font-bold text-xl">SC</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">HSC HTTP</span>
+            <span className="text-2xl font-bold text-gray-900">Shadow Connects</span>
           </div>
           <div className="hidden md:flex items-center space-x-8">
             <a
               href="#features"
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
-              Features
+              How It Works
             </a>
             <a
-              href="#docs"
+              href="#opportunities"
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
-              Documentation
+              Opportunities
             </a>
             <a
               href="#about"
@@ -29,7 +29,7 @@ export function Header() {
               About
             </a>
             <button className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors">
-              Get Started
+              Sign Up
             </button>
           </div>
           <button className="md:hidden text-gray-700">

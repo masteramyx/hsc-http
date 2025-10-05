@@ -5,20 +5,20 @@ export function Hero() {
       <div className="container mx-auto px-6 py-24 md:py-32 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            High-Performance
+            Connect With
             <span className="block bg-gradient-to-r from-primary-200 to-white bg-clip-text text-transparent">
-              HTTP Server
+              Healthcare Professionals
             </span>
           </h1>
           <p className="text-xl md:text-2xl mb-10 text-primary-100 leading-relaxed">
-            Built with Kotlin Multiplatform. Blazingly fast, scalable, and production-ready.
+            Gain invaluable clinical experience through professional health shadowing opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
-              Get Started
+              Find Opportunities
             </button>
             <button className="px-8 py-4 bg-primary-800/50 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-primary-800/70 transition-colors border border-primary-400/30">
-              View Documentation
+              For Professionals
             </button>
           </div>
         </div>

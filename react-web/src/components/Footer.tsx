@@ -8,50 +8,50 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">H</span>
+                <span className="text-white font-bold">SC</span>
               </div>
-              <span className="text-xl font-bold text-white">HSC HTTP</span>
+              <span className="text-xl font-bold text-white">Shadow Connects</span>
             </div>
             <p className="text-sm text-gray-400">
-              High-performance HTTP server built with Kotlin Multiplatform.
+              Connecting aspiring healthcare professionals with clinical shadowing opportunities.
             </p>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Product</h3>
+            <h3 className="text-white font-semibold mb-4">For Students</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#features" className="hover:text-primary-400 transition-colors">
-                  Features
+                <a href="#browse" className="hover:text-primary-400 transition-colors">
+                  Browse Opportunities
                 </a>
               </li>
               <li>
-                <a href="#docs" className="hover:text-primary-400 transition-colors">
-                  Documentation
+                <a href="#how-it-works" className="hover:text-primary-400 transition-colors">
+                  How It Works
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-primary-400 transition-colors">
-                  Pricing
+                <a href="#success-stories" className="hover:text-primary-400 transition-colors">
+                  Success Stories
                 </a>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
+            <h3 className="text-white font-semibold mb-4">For Professionals</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#guides" className="hover:text-primary-400 transition-colors">
-                  Guides
+                <a href="#list-opportunity" className="hover:text-primary-400 transition-colors">
+                  List Opportunity
                 </a>
               </li>
               <li>
-                <a href="#api" className="hover:text-primary-400 transition-colors">
-                  API Reference
+                <a href="#benefits" className="hover:text-primary-400 transition-colors">
+                  Benefits
                 </a>
               </li>
               <li>
-                <a href="#examples" className="hover:text-primary-400 transition-colors">
-                  Examples
+                <a href="#guidelines" className="hover:text-primary-400 transition-colors">
+                  Guidelines
                 </a>
               </li>
             </ul>
@@ -78,7 +78,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-12 pt-8 text-sm text-gray-400 text-center">
-          <p>&copy; {currentYear} HSC HTTP. All rights reserved.</p>
+          <p>&copy; {currentYear} Shadow Connects. All rights reserved.</p>
         </div>
       </div>
     </footer>

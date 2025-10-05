@@ -6,34 +6,34 @@ interface Feature {
 
 const features: Feature[] = [
   {
-    icon: '⚡',
-    title: 'Lightning Fast',
-    description: 'Built on Ktor for exceptional performance and low latency response times.',
+    icon: '🏥',
+    title: 'Connect With Professionals',
+    description: 'Network directly with physicians, nurses, and healthcare providers willing to share their expertise.',
   },
   {
-    icon: '🔒',
-    title: 'Secure by Default',
-    description: 'Industry-standard security practices with authentication and session management.',
+    icon: '📚',
+    title: 'Gain Clinical Experience',
+    description: 'Observe real-world medical procedures and patient care in various healthcare settings.',
   },
   {
-    icon: '🎯',
-    title: 'Type-Safe',
-    description: 'Leverages Kotlin\'s powerful type system for compile-time safety and reliability.',
+    icon: '🎓',
+    title: 'Career Development',
+    description: 'Explore different medical specialties to find your passion before committing to a career path.',
   },
   {
-    icon: '🔄',
-    title: 'Multiplatform',
-    description: 'Kotlin Multiplatform architecture enables seamless code sharing across platforms.',
+    icon: '🤝',
+    title: 'Mentorship Opportunities',
+    description: 'Build lasting relationships with experienced healthcare professionals who guide your journey.',
   },
   {
-    icon: '📦',
-    title: 'Easy Deployment',
-    description: 'Docker-ready with simple configuration and deployment options.',
+    icon: '⏰',
+    title: 'Flexible Scheduling',
+    description: 'Find shadowing opportunities that fit your schedule, from single-day visits to ongoing programs.',
   },
   {
-    icon: '🛠️',
-    title: 'Developer Friendly',
-    description: 'Clear APIs, comprehensive documentation, and excellent IDE support.',
+    icon: '✅',
+    title: 'Verified Opportunities',
+    description: 'All shadowing positions are verified and comply with healthcare privacy and safety standards.',
   },
 ];
 
@@ -43,10 +43,10 @@ export function Features() {
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Why Choose HSC HTTP?
+            Why Choose Shadow Connects?
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            A modern HTTP server designed for developers who demand performance and reliability.
+            The premier platform connecting aspiring healthcare professionals with real-world clinical experience.
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
