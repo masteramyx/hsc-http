@@ -14,20 +14,33 @@ object DatabaseFactory {
         username: String = System.getenv("DATABASE_USER") ?: "hsc_user",
         password: String = System.getenv("DATABASE_PASSWORD") ?: "hsc_dev_password"
     ) {
-        // Parse Render's DATABASE_URL format: postgresql://user:pass@host:port/dbname
-        // Convert to JDBC format: jdbc:postgresql://host:port/dbname
-        val jdbcUrl = if (databaseUrl.startsWith("postgresql://") && !databaseUrl.startsWith("jdbc:")) {
-            databaseUrl.replaceFirst("postgresql://", "jdbc:postgresql://")
-        } else if (databaseUrl.startsWith("postgres://") && !databaseUrl.startsWith("jdbc:")) {
-            databaseUrl.replaceFirst("postgres://", "jdbc:postgresql://")
+        // Parse Render's DATABASE_URL format: postgresql://user:pass@host/dbname (no port)
+        // Convert to JDBC format: jdbc:postgresql://host:5432/dbname
+        val (jdbcUrl, dbUser, dbPassword) = if (databaseUrl.startsWith("postgresql://") || databaseUrl.startsWith("postgres://")) {
+            // Extract: postgresql://user:pass@host/database
+            val withoutProtocol = databaseUrl.substringAfter("://")
+            val credentials = withoutProtocol.substringBefore("@")
+            val hostAndDb = withoutProtocol.substringAfter("@")
+
+            val user = credentials.substringBefore(":")
+            val pass = credentials.substringAfter(":")
+
+            // Add port 5432 if not present
+            val jdbcHost = if (hostAndDb.contains(":")) hostAndDb else {
+                val host = hostAndDb.substringBefore("/")
+                val db = hostAndDb.substringAfter("/")
+                "$host:5432/$db"
+            }
+
+            Triple("jdbc:postgresql://$jdbcHost", user, pass)
         } else {
-            databaseUrl
+            Triple(databaseUrl, username, password)
         }
 
         val config = HikariConfig().apply {
             this.jdbcUrl = jdbcUrl
-            this.username = username
-            this.password = password
+            this.username = dbUser
+            this.password = dbPassword
             driverClassName = "org.postgresql.Driver"
             maximumPoolSize = 10
             isAutoCommit = true
