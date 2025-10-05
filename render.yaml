@@ -1,12 +1,10 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: hsc-http-db
-    plan: free
+databases:
+  - name: hsc-http-db
     databaseName: healthshadow_dev
-    databaseUser: hsc_user
+    user: hsc_user
+    plan: free
 
-  # Ktor Backend (serves React frontend too)
+services:
   - type: web
     name: hsc-http-backend
     runtime: docker
