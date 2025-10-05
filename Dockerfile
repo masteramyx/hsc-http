@@ -28,10 +28,10 @@ COPY react-web/ react-web/
 RUN chmod +x ./gradlew
 
 # Build the backend and React frontend
-RUN ./gradlew :app:build :db:build :shared:build :react-web:assemble --no-daemon
+RUN ./gradlew :app:shadowJar :react-web:assemble --no-daemon
 
 # Expose port 8080
 EXPOSE 8080
 
-# Run the application
-CMD ["./gradlew", "run", "--no-daemon"]
+# Run the Fat JAR
+CMD ["java", "-jar", "/app/app/build/libs/app-0.0.1-all.jar"]
