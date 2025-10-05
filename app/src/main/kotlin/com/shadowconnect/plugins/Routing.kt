@@ -40,10 +40,23 @@ fun Application.configureRouting() {
             val composeLocalPath = File("../web/build/processedResources/js/main/index.html")
 
             val indexFile = when {
-                reactDockerPath.exists() -> reactDockerPath
-                reactLocalPath.exists() -> reactLocalPath
-                composeDockerPath.exists() -> composeDockerPath
-                else -> composeLocalPath
+                reactDockerPath.exists() -> {
+                    application.log.info("Serving React build from: ${reactDockerPath.absolutePath}")
+                    reactDockerPath
+                }
+                reactLocalPath.exists() -> {
+                    application.log.info("Serving React build from: ${reactLocalPath.absolutePath}")
+                    reactLocalPath
+                }
+                composeDockerPath.exists() -> {
+                    application.log.info("Serving Compose Web from: ${composeDockerPath.absolutePath}")
+                    composeDockerPath
+                }
+                else -> {
+                    application.log.error("No frontend build found! Checked: $reactDockerPath, $reactLocalPath, $composeDockerPath, $composeLocalPath")
+                    call.respondText("Frontend build not found", status = HttpStatusCode.NotFound)
+                    return@get
+                }
             }
             call.respondFile(indexFile)
         }
