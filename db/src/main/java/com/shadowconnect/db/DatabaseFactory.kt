@@ -14,8 +14,16 @@ object DatabaseFactory {
         username: String = System.getenv("DATABASE_USER") ?: "hsc_user",
         password: String = System.getenv("DATABASE_PASSWORD") ?: "hsc_dev_password"
     ) {
+        // Parse Render's DATABASE_URL format: postgres://user:pass@host:port/dbname
+        // Convert to JDBC format: jdbc:postgresql://host:port/dbname
+        val jdbcUrl = if (databaseUrl.startsWith("postgres://") && !databaseUrl.startsWith("jdbc:")) {
+            databaseUrl.replaceFirst("postgres://", "jdbc:postgresql://")
+        } else {
+            databaseUrl
+        }
+
         val config = HikariConfig().apply {
-            jdbcUrl = databaseUrl
+            this.jdbcUrl = jdbcUrl
             this.username = username
             this.password = password
             driverClassName = "org.postgresql.Driver"

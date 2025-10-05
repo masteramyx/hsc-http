@@ -95,6 +95,11 @@
 - Interdisciplinary education emphasis
 - 67% MD school acceptance rate
 
+### **U Pitt**
+[Uni Shadowing](https://www.emergencymedicine.pitt.edu/education/undergraduate-graduate-and-medical-students/shadowing)  
+[UPMC Shadowing](https://www.upmc.com/healthcare-professionals/education/shadowing-touring)  
+
+
 ## **Universities with Strong Shadowing Support (but less structured programs):**
 
 - **Johns Hopkins** - Hospital shadowing coordination
