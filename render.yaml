@@ -15,5 +15,4 @@ services:
         fromDatabase:
           name: hsc-http-db
           property: connectionString
-      - key: PORT
-        value: "10000"
+
