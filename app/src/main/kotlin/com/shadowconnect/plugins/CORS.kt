@@ -32,7 +32,11 @@ fun Application.configureCORS() {
         allowHost("127.0.0.1:8081", listOf("http", "https"))
         allowHost("localhost:8080", listOf("http", "https"))
         allowHost("127.0.0.1:8080", listOf("http", "https"))
-        
+
+        // Allow Render deployment
+        allowHost("hsc-http-backend.onrender.com", listOf("https"))
+        allowHost("shadowconnects.com", listOf("https", "http"))
+
         // Note: anyHost() cannot be used with allowCredentials = true
     }
 }
