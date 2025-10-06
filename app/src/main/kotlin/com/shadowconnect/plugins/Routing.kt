@@ -19,6 +19,16 @@ data class HealthStatus(
     val timestamp: String
 )
 
+@Serializable
+data class DebugFilesResponse(
+    val reactWebExists: Boolean,
+    val reactWebPath: String,
+    val reactWebContents: List<String>,
+    val buildDirExists: Boolean,
+    val buildDirPath: String,
+    val buildContents: List<String>
+)
+
 //todo add note about what this class does
 fun Application.configureRouting() {
 
@@ -83,20 +93,16 @@ fun Application.configureRouting() {
             val reactWebDir = File("/app/react-web")
             val buildDir = File("/app/react-web/build")
 
-            val debugInfo = mutableMapOf<String, Any>()
-            debugInfo["reactWebExists"] = reactWebDir.exists()
-            debugInfo["reactWebPath"] = reactWebDir.absolutePath
-            if (reactWebDir.exists()) {
-                debugInfo["reactWebContents"] = reactWebDir.listFiles()?.map { it.name } ?: emptyList<String>()
-            }
+            val response = DebugFilesResponse(
+                reactWebExists = reactWebDir.exists(),
+                reactWebPath = reactWebDir.absolutePath,
+                reactWebContents = reactWebDir.listFiles()?.map { it.name } ?: emptyList(),
+                buildDirExists = buildDir.exists(),
+                buildDirPath = buildDir.absolutePath,
+                buildContents = buildDir.listFiles()?.map { it.name } ?: emptyList()
+            )
 
-            debugInfo["buildDirExists"] = buildDir.exists()
-            debugInfo["buildDirPath"] = buildDir.absolutePath
-            if (buildDir.exists()) {
-                debugInfo["buildContents"] = buildDir.listFiles()?.map { it.name } ?: emptyList<String>()
-            }
-
-            call.respond(debugInfo)
+            call.respond(response)
         }
 
         get("/health") {
