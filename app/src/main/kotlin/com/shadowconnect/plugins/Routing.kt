@@ -79,6 +79,27 @@ fun Application.configureRouting() {
             staticFiles("/static", composeStaticPath)
         }
         
+        get("/debug-files") {
+            val reactWebDir = File("/app/react-web")
+            val buildDir = File("/app/react-web/build")
+
+            val debugInfo = buildMapOf<String, Any>().apply {
+                put("reactWebExists", reactWebDir.exists())
+                put("reactWebPath", reactWebDir.absolutePath)
+                if (reactWebDir.exists()) {
+                    put("reactWebContents", reactWebDir.listFiles()?.map { it.name } ?: emptyList<String>())
+                }
+
+                put("buildDirExists", buildDir.exists())
+                put("buildDirPath", buildDir.absolutePath)
+                if (buildDir.exists()) {
+                    put("buildContents", buildDir.listFiles()?.map { it.name } ?: emptyList<String>())
+                }
+            }
+
+            call.respond(debugInfo)
+        }
+
         get("/health") {
             try {
                 // Test database connection by querying students
