@@ -498,6 +498,71 @@ This project follows industry-standard testing practices with clear separation o
 - **Local Development:** `app/src/main/resources/application.conf`
 - **Production:** Environment variables override configuration
 
+## CORS (Cross-Origin Resource Sharing)
+
+### What is CORS?
+
+CORS is a browser security feature that controls which websites can make requests to your server. By default, browsers block requests from one domain to another (e.g., `frontend.com` trying to call `api.backend.com`).
+
+**Example of CORS in Action:**
+```
+Your React app at:     https://app.shadowconnects.com
+Tries to fetch from:   https://api.shadowconnects.com/students
+
+Browser checks: "Does api.shadowconnects.com allow requests from app.shadowconnects.com?"
+- If YES (CORS configured): Request proceeds
+- If NO (CORS not configured): Request blocked, console shows CORS error
+```
+
+### Why Does CORS Exist?
+
+Without CORS, any malicious website could make requests to your bank's API using your logged-in session. CORS ensures only trusted origins can access your server.
+
+### When Do You Need CORS?
+
+**CORS is Required When:**
+- Frontend and backend are on different domains/subdomains
+- Frontend runs on `localhost:3000` and backend on `localhost:8080`
+- Mobile apps making API requests
+- Third-party services accessing your API
+
+**CORS is NOT Required When:**
+- Frontend and backend served from the same domain (e.g., both at `shadowconnects.com`)
+- Server-to-server communication (no browser involved)
+
+### CORS Configuration in This Project
+
+Located in `app/src/main/kotlin/com/shadowconnect/plugins/CORS.kt`:
+
+```kotlin
+fun Application.configureCORS() {
+    install(CORS) {
+        allowMethod(HttpMethod.Get)       // Allow GET requests
+        allowMethod(HttpMethod.Post)      // Allow POST requests
+        allowHeader(HttpHeaders.ContentType)  // Allow Content-Type header
+        allowCredentials = true           // Allow cookies/sessions
+
+        // Allow specific origins
+        allowHost("localhost:3000", listOf("http", "https"))
+        allowHost("shadowconnects.com", listOf("https"))
+    }
+}
+```
+
+### Common CORS Errors and Fixes
+
+**Error:** `Access to fetch has been blocked by CORS policy`
+- **Cause:** Your frontend's domain is not in `allowHost()` list
+- **Fix:** Add the domain to CORS configuration
+
+**Error:** `The 'Access-Control-Allow-Origin' header contains multiple values`
+- **Cause:** Multiple CORS configurations or conflicting settings
+- **Fix:** Ensure only one CORS configuration in your application
+
+**Error:** `Credential is not supported if the CORS header 'Access-Control-Allow-Origin' is '*'`
+- **Cause:** Using `anyHost()` with `allowCredentials = true`
+- **Fix:** Use specific `allowHost()` entries instead of `anyHost()`
+
 ## Development DB Commands
 
 ### Connect to PostgreSQL Database
