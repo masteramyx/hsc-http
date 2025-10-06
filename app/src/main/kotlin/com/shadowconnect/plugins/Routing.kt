@@ -83,18 +83,17 @@ fun Application.configureRouting() {
             val reactWebDir = File("/app/react-web")
             val buildDir = File("/app/react-web/build")
 
-            val debugInfo = buildMapOf<String, Any>().apply {
-                put("reactWebExists", reactWebDir.exists())
-                put("reactWebPath", reactWebDir.absolutePath)
-                if (reactWebDir.exists()) {
-                    put("reactWebContents", reactWebDir.listFiles()?.map { it.name } ?: emptyList<String>())
-                }
+            val debugInfo = mutableMapOf<String, Any>()
+            debugInfo["reactWebExists"] = reactWebDir.exists()
+            debugInfo["reactWebPath"] = reactWebDir.absolutePath
+            if (reactWebDir.exists()) {
+                debugInfo["reactWebContents"] = reactWebDir.listFiles()?.map { it.name } ?: emptyList<String>()
+            }
 
-                put("buildDirExists", buildDir.exists())
-                put("buildDirPath", buildDir.absolutePath)
-                if (buildDir.exists()) {
-                    put("buildContents", buildDir.listFiles()?.map { it.name } ?: emptyList<String>())
-                }
+            debugInfo["buildDirExists"] = buildDir.exists()
+            debugInfo["buildDirPath"] = buildDir.absolutePath
+            if (buildDir.exists()) {
+                debugInfo["buildContents"] = buildDir.listFiles()?.map { it.name } ?: emptyList<String>()
             }
 
             call.respond(debugInfo)
