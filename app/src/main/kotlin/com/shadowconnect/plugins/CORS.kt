@@ -27,15 +27,21 @@ fun Application.configureCORS() {
         allowHeader(HttpHeaders.ContentType)
         allowCredentials = true
 
+        // Allow requests with no origin (same-origin requests)
+        allowNonSimpleContentTypes = true
+
         // Allow specific localhost origins (required when allowCredentials = true)
         allowHost("localhost:8081", listOf("http", "https"))
         allowHost("127.0.0.1:8081", listOf("http", "https"))
         allowHost("localhost:8080", listOf("http", "https"))
         allowHost("127.0.0.1:8080", listOf("http", "https"))
+        allowHost("localhost:10000", listOf("http", "https"))
+        allowHost("0.0.0.0:10000", listOf("http", "https"))
 
-        // Allow Render deployment
+        // Allow Render deployment - with and without www
         allowHost("hsc-http-backend.onrender.com", listOf("https"))
         allowHost("shadowconnects.com", listOf("https", "http"))
+        allowHost("www.shadowconnects.com", listOf("https", "http"))
 
         // Note: anyHost() cannot be used with allowCredentials = true
     }
