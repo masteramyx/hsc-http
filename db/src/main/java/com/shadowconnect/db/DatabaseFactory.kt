@@ -49,6 +49,10 @@ object DatabaseFactory {
         
         dataSource = HikariDataSource(config)
         val driver = dataSource?.asJdbcDriver() ?: throw IllegalStateException("Failed to create DataSource")
+
+        // Create tables if they don't exist
+        HealthShadowDatabase.Schema.create(driver)
+
         database = HealthShadowDatabase(driver)
     }
 
