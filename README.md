@@ -226,6 +226,48 @@ volumes:
 
 ### Local Development
 
+#### First-Time Setup: Build the Application Image
+
+**On a fresh machine, you need to build both the frontend and backend before running the application.**
+
+##### 1. Build the React Frontend
+
+The application serves a React frontend that must be built before the backend can serve it.
+
+```bash
+# Navigate to the React frontend directory
+cd react-web
+npm install 
+npm run build 
+cd ..
+```
+
+**What this does:**
+- `npm install` downloads packages listed in package.json to node_modules/
+- `npm run build` compiles TypeScript → JavaScript, bundles React components, minifies code, and outputs to
+  react-web/build/
+
+**Development vs Production:**
+- Development: `npm run dev` starts a local server at localhost:3000 with hot-reload
+- Production: `npm run build` creates optimized files in react-web/build/ for deployment
+
+##### 2. Build the Docker Image
+
+Once the frontend is built, create the Docker image for the Ktor backend:
+
+```bash
+docker build -t hsc-http:latest .
+```
+
+**Why this is needed:**
+- docker-compose expects a pre-built image named hsc-http:latest
+- The Dockerfile copies everything needed from the app into the docker image
+- Without this step, you get the "repository does not exist" error
+
+**Troubleshooting:**
+- If `docker-compose up` fails with "repository does not exist", you forgot this step
+- If the frontend doesn't load, rebuild the React app first
+
 #### Setup PostgreSQL Database
 ```bash
 # Start PostgreSQL container for development
