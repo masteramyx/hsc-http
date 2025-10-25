@@ -535,10 +535,68 @@ This project follows industry-standard testing practices with clear separation o
 - `PORT` - Application port (default: 8080)
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret key for JWT tokens (when implemented)
+- `ANTHROPIC_API_KEY` - API key for Claude AI chatbot integration (required for chat feature)
 
 ### Application Configuration
 - **Local Development:** `app/src/main/resources/application.conf`
 - **Production:** Environment variables override configuration
+
+## AI Chatbot Integration
+
+The application includes an AI-powered chatbot using Claude (Anthropic's AI assistant) to provide users with guidance and answer questions.
+
+### Features
+- **Real-time Streaming Responses:** Messages stream in character-by-character for a natural conversation feel
+- **Floating Chat Widget:** Non-intrusive chat button in the bottom-right corner
+- **Modern UI:** Built with React and Tailwind CSS, matches the site's design
+
+### Setup
+
+1. **Get an API Key:**
+   - Sign up at [Anthropic Console](https://console.anthropic.com/)
+   - Generate an API key from your account settings
+   - Free tier available with generous limits
+
+2. **Set Environment Variable:**
+   ```bash
+   # For local development
+   export ANTHROPIC_API_KEY="your-api-key-here"
+
+   # Or add to your shell profile (~/.bashrc, ~/.zshrc, etc.)
+   echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+3. **For Docker Deployment:**
+   ```yaml
+   # In docker-compose.yml
+   services:
+     app:
+       environment:
+         - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+   ```
+
+   Then set the variable on your host:
+   ```bash
+   export ANTHROPIC_API_KEY="your-api-key-here"
+   docker-compose up -d
+   ```
+
+### Usage
+- Click the chat button in the bottom-right corner
+- Type your question and press Enter or click Send
+- Responses stream in real-time from Claude
+
+### API Endpoint
+- `POST /api/chat` - Send messages to the chatbot
+- Request body: `{"message": "your question here"}`
+- Response: Server-Sent Events (SSE) stream
+
+### Cost
+Claude API pricing (as of 2024):
+- **Claude 3.5 Sonnet:** ~$3 per million input tokens, ~$15 per million output tokens
+- Typical chat message: 100-500 tokens
+- Very affordable for personal/small business use
 
 ## CORS (Cross-Origin Resource Sharing)
 

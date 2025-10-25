@@ -39,6 +39,12 @@ dependencies {
     implementation(libs.ktor.server.html.builder)
     implementation(libs.bcrypt)
     implementation(libs.logback.classic)
+
+    // Ktor Client for Claude API
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.mock)

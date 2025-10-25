@@ -31,6 +31,7 @@ fun Application.configureCORS() {
         allowNonSimpleContentTypes = true
 
         // Allow specific localhost origins (required when allowCredentials = true)
+        allowHost("localhost:3000", listOf("http", "https"))  // React dev server
         allowHost("localhost:8081", listOf("http", "https"))
         allowHost("127.0.0.1:8081", listOf("http", "https"))
         allowHost("localhost:8080", listOf("http", "https"))
