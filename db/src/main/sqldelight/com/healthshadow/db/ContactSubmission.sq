@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS contact_submission
+(
+    id           SERIAL8 PRIMARY KEY,
+    name         VARCHAR(255) NOT NULL,
+    email        VARCHAR(255) NOT NULL,
+    user_type    VARCHAR(20)  NOT NULL CHECK (user_type IN ('professional', 'student')),
+    message      TEXT         NOT NULL,
+    created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create index for faster queries
+CREATE INDEX IF NOT EXISTS idx_contact_submission_created_at ON contact_submission(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_submission_email ON contact_submission(email);
+
+-- Insert a contact submission
+insertContactSubmission:
+INSERT INTO contact_submission (name, email, user_type, message)
+VALUES (?, ?, ?, ?)
+RETURNING id;
+
+-- Get all contact submissions ordered by time
+getAllContactSubmissions:
+SELECT * FROM contact_submission ORDER BY created_at DESC;
+
+-- Get contact submission by ID
+getContactSubmissionById:
+SELECT * FROM contact_submission WHERE id = ?;
+
+-- Get contact submissions by email
+getContactSubmissionsByEmail:
+SELECT * FROM contact_submission WHERE email = ? ORDER BY created_at DESC;

@@ -1,3 +1,5 @@
+import { ContactForm } from './ContactForm';
+
 export function CTA() {
   return (
     <section className="py-20 bg-gradient-to-r from-primary-600 to-primary-800">
@@ -9,6 +11,10 @@ export function CTA() {
           <p className="text-xl text-primary-100 mb-10 leading-relaxed">
             Join thousands of students and aspiring healthcare professionals gaining valuable clinical experience.
           </p>
+
+          {/* Contact Form Button */}
+          <ContactForm />
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
               Browse Opportunities
