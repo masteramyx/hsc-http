@@ -17,6 +17,18 @@ data class ContactSubmissionRequest(
     val message: String
 )
 
+@Serializable
+data class ContactSubmissionResponse(
+    val success: Boolean,
+    val id: Long,
+    val message: String
+)
+
+@Serializable
+data class ErrorResponse(
+    val error: String
+)
+
 fun Route.contactRouting() {
     val database = DatabaseFactory.getDatabase()
     val contactRepository = ContactSubmissionRepositoryImpl(database)
@@ -29,7 +41,7 @@ fun Route.contactRouting() {
             if (request.userType !in listOf("professional", "student")) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    mapOf("error" to "Invalid user type. Must be 'professional' or 'student'")
+                    ErrorResponse("Invalid user type. Must be 'professional' or 'student'")
                 )
                 return@post
             }
@@ -38,7 +50,7 @@ fun Route.contactRouting() {
             if (!request.email.contains("@")) {
                 call.respond(
                     HttpStatusCode.BadRequest,
-                    mapOf("error" to "Invalid email format")
+                    ErrorResponse("Invalid email format")
                 )
                 return@post
             }
@@ -53,17 +65,17 @@ fun Route.contactRouting() {
 
             call.respond(
                 HttpStatusCode.Created,
-                mapOf(
-                    "success" to true,
-                    "id" to id,
-                    "message" to "Contact submission received successfully"
+                ContactSubmissionResponse(
+                    success = true,
+                    id = id,
+                    message = "Contact submission received successfully"
                 )
             )
         } catch (e: Exception) {
             println("Error saving contact submission: ${e.message}")
             call.respond(
                 HttpStatusCode.InternalServerError,
-                mapOf("error" to (e.message ?: "Unknown error occurred"))
+                ErrorResponse(e.message ?: "Unknown error occurred")
             )
         }
     }
@@ -77,7 +89,7 @@ fun Route.contactRouting() {
             println("Error fetching contact submissions: ${e.message}")
             call.respond(
                 HttpStatusCode.InternalServerError,
-                mapOf("error" to (e.message ?: "Unknown error occurred"))
+                ErrorResponse(e.message ?: "Unknown error occurred")
             )
         }
     }
