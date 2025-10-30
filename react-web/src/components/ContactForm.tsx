@@ -1,6 +1,17 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
-export function ContactForm() {
+interface ContactFormProps {
+  buttonText?: string;
+  buttonClassName?: string;
+  wrapperClassName?: string;
+}
+
+export function ContactForm({
+  buttonText = 'Contact Us',
+  buttonClassName = 'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg',
+  wrapperClassName = 'text-center mb-12'
+}: ContactFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -45,19 +56,19 @@ export function ContactForm() {
   return (
     <>
       {/* Contact Button */}
-      <div className="text-center mb-12">
+      <div className={wrapperClassName}>
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 hover:scale-105 shadow-lg"
+          className={buttonClassName}
         >
-          Contact Us
+          {buttonText}
         </button>
       </div>
 
-      {/* Modal Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative">
+      {/* Modal Overlay - Rendered via Portal to escape header positioning */}
+      {isOpen && createPortal(
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative my-8">
             {/* Close button */}
             <button
               onClick={() => setIsOpen(false)}
@@ -199,7 +210,8 @@ export function ContactForm() {
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

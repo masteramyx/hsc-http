@@ -663,6 +663,184 @@ fun Application.configureCORS() {
 - **Cause:** Using `anyHost()` with `allowCredentials = true`
 - **Fix:** Use specific `allowHost()` entries instead of `anyHost()`
 
+## SEO (Search Engine Optimization)
+
+### What is SEO?
+
+SEO is the practice of optimizing your website to rank higher in search engine results (Google, Bing, etc.). When someone searches for "clinical shadowing opportunities," you want your site to appear on the first page of results.
+
+**Why SEO Matters:**
+- **Discoverability:** 93% of online experiences begin with a search engine
+- **Organic Traffic:** Free, sustainable traffic vs. paying for ads
+- **Credibility:** Higher rankings = more trust from users
+- **Target Audience:** Reach students actively searching for shadowing opportunities
+
+### SEO Crash Course
+
+**How Search Engines Work:**
+1. **Crawling:** Bots discover your pages by following links
+2. **Indexing:** Pages are analyzed and stored in a database
+3. **Ranking:** Algorithm determines which pages to show for each search query
+
+**Three Pillars of SEO:**
+1. **Technical SEO:** Site structure, speed, mobile-friendliness
+2. **On-Page SEO:** Content, meta tags, keywords, headings
+3. **Off-Page SEO:** Backlinks, social signals, domain authority
+
+### Multi-Page Architecture for SEO
+
+**The Problem with Single-Page Apps (SPAs):**
+
+Traditional SPAs serve all content from one URL with anchor links (`#about`, `#features`). This is bad for SEO because:
+- Google sees only one page to index
+- Can't target different keywords per "page"
+- Poor internal linking structure
+- Difficult to share specific sections
+
+**Our Solution: Client-Side Routing with React Router**
+
+We use React Router to create distinct URLs for different content:
+```
+/ → Homepage (clinical shadowing opportunities)
+/how-it-works → Process explanation
+/opportunities → Browse opportunities
+/about → Mission and team
+/for-students → Student-focused content
+/for-professionals → Professional-focused content
+```
+
+Each route:
+- Has a unique URL Google can index
+- Targets specific keywords
+- Has custom meta tags and descriptions
+- Provides shareable links
+
+### Technical SEO Implementation
+
+**1. Multi-Page Routing**
+- **Technology:** React Router DOM
+- **Location:** `react-web/src/App.tsx`
+- **Benefit:** Each URL is a distinct page for search engines
+
+**2. Dynamic Meta Tags**
+- **Technology:** react-helmet-async
+- **Location:** `react-web/src/components/SEOHead.tsx`
+- **What We Include:**
+  - Unique `<title>` tags per page
+  - Meta descriptions (150-160 characters)
+  - Open Graph tags (social media sharing)
+  - Twitter Card tags
+  - Canonical URLs (prevent duplicate content)
+
+Example from HomePage:
+```tsx
+<SEOHead
+  title="Clinical Shadowing Opportunities"
+  description="Connect with healthcare professionals and gain valuable clinical experience..."
+  path="/"
+/>
+```
+
+**3. SPA Fallback Routing**
+- **Location:** `app/src/main/kotlin/com/shadowconnect/plugins/Routing.kt`
+- **Purpose:** Serve `index.html` for all non-API routes
+- **How It Works:**
+  ```kotlin
+  // Catch-all route serves React app for client-side routing
+  get("{...}") {
+      call.respondFile(indexFile)
+  }
+  ```
+- **Why Needed:** Allows users to refresh on `/about` or directly visit `/opportunities` without 404 errors
+
+**4. Semantic HTML Structure**
+- Proper heading hierarchy (H1 → H2 → H3)
+- Semantic tags (`<header>`, `<main>`, `<section>`, `<footer>`)
+- Descriptive link text (avoid "click here")
+
+**5. Mobile Responsiveness**
+- **Technology:** Tailwind CSS with responsive breakpoints
+- **Why It Matters:** Google uses mobile-first indexing
+
+### Current SEO Optimizations
+
+✅ **Implemented:**
+- Multi-page routing with React Router
+- Unique meta tags per page (title, description, Open Graph)
+- Canonical URLs to prevent duplicate content
+- Mobile-responsive design
+- Fast page loads (Vite bundler)
+- Semantic HTML structure
+- Internal linking (header, footer, CTAs)
+- Backend SPA fallback for proper routing
+
+### Future SEO Improvements
+
+📋 **Planned:**
+
+1. **sitemap.xml**
+   - XML file listing all pages
+   - Helps search engines discover content
+   - Location: `/sitemap.xml`
+
+2. **robots.txt**
+   - Guides search engine crawlers
+   - Specifies what to crawl/not crawl
+   - Location: `/robots.txt`
+
+3. **Structured Data (Schema.org)**
+   - JSON-LD markup for rich search results
+   - Types: Organization, BreadcrumbList, FAQPage
+   - Enables features like knowledge panels
+
+4. **Content Strategy**
+   - Blog section at `/blog/` for keyword-rich articles
+   - FAQ page with structured data
+   - Success stories and testimonials
+
+5. **Performance Optimization**
+   - Image optimization and lazy loading
+   - Code splitting for faster initial loads
+   - CDN for static assets
+
+6. **Analytics & Monitoring**
+   - Google Search Console (track indexing)
+   - Google Analytics 4 (user behavior)
+   - Core Web Vitals monitoring
+
+7. **Backlink Building**
+   - Partnerships with medical schools
+   - Directory listings (healthcare education)
+   - Guest posts on healthcare blogs
+
+### SEO Best Practices for Contributors
+
+When adding new pages or content:
+
+1. **Create Unique Pages:** Add new routes in `App.tsx` for distinct content
+2. **Add SEO Tags:** Use `<SEOHead>` component with unique title/description
+3. **Use Keywords Naturally:** Include "clinical shadowing," "healthcare," "medical students"
+4. **Optimize Headers:** One H1 per page, logical H2/H3 hierarchy
+5. **Write Descriptive Links:** Use meaningful anchor text ("Browse Opportunities" not "Click Here")
+6. **Mobile First:** Test all pages on mobile devices
+7. **Page Speed:** Keep images optimized, avoid heavy libraries
+
+### Measuring SEO Success
+
+**Key Metrics to Track:**
+- Organic search traffic (Google Analytics)
+- Keyword rankings ("clinical shadowing opportunities")
+- Click-through rate (Google Search Console)
+- Page indexing status
+- Core Web Vitals (LCP, FID, CLS)
+- Backlink quantity and quality
+
+**Tools:**
+- Google Search Console (free)
+- Google Analytics 4 (free)
+- Google PageSpeed Insights (free)
+- Ahrefs or SEMrush (paid, advanced)
+
 ## Development DB Commands
 
 ### Connect to PostgreSQL Database

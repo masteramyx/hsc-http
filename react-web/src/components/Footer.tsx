@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -6,12 +8,12 @@ export function Footer() {
       <div className="container mx-auto px-6 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
+            <Link to="/" className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">SC</span>
               </div>
               <span className="text-xl font-bold text-white">Shadow Connects</span>
-            </div>
+            </Link>
             <p className="text-sm text-gray-400">
               Connecting aspiring healthcare professionals with clinical shadowing opportunities.
             </p>
@@ -20,19 +22,19 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">For Students</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#browse" className="hover:text-primary-400 transition-colors">
+                <Link to="/opportunities" className="hover:text-primary-400 transition-colors">
                   Browse Opportunities
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#how-it-works" className="hover:text-primary-400 transition-colors">
+                <Link to="/how-it-works" className="hover:text-primary-400 transition-colors">
                   How It Works
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#success-stories" className="hover:text-primary-400 transition-colors">
-                  Success Stories
-                </a>
+                <Link to="/for-students" className="hover:text-primary-400 transition-colors">
+                  For Students
+                </Link>
               </li>
             </ul>
           </div>
@@ -40,39 +42,39 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-4">For Professionals</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#list-opportunity" className="hover:text-primary-400 transition-colors">
-                  List Opportunity
-                </a>
+                <Link to="/for-professionals" className="hover:text-primary-400 transition-colors">
+                  For Professionals
+                </Link>
               </li>
               <li>
-                <a href="#benefits" className="hover:text-primary-400 transition-colors">
-                  Benefits
-                </a>
+                <Link to="/how-it-works" className="hover:text-primary-400 transition-colors">
+                  How It Works
+                </Link>
               </li>
               <li>
-                <a href="#guidelines" className="hover:text-primary-400 transition-colors">
-                  Guidelines
-                </a>
+                <Link to="/about" className="hover:text-primary-400 transition-colors">
+                  About Us
+                </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-white font-semibold mb-4">Community</h3>
+            <h3 className="text-white font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#github" className="hover:text-primary-400 transition-colors">
+                <Link to="/about" className="hover:text-primary-400 transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">
                   GitHub
                 </a>
               </li>
               <li>
-                <a href="#discord" className="hover:text-primary-400 transition-colors">
-                  Discord
-                </a>
-              </li>
-              <li>
-                <a href="#twitter" className="hover:text-primary-400 transition-colors">
-                  Twitter
-                </a>
+                <Link to="/" className="hover:text-primary-400 transition-colors">
+                  Contact
+                </Link>
               </li>
             </ul>
           </div>

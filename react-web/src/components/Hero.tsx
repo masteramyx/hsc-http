@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ContactForm } from './ContactForm';
 
 export function Hero() {
@@ -20,12 +21,18 @@ export function Hero() {
           <ContactForm />
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+            <Link
+              to="/opportunities"
+              className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all inline-block"
+            >
               Find Opportunities
-            </button>
-            <button className="px-8 py-4 bg-primary-800/50 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-primary-800/70 transition-colors border border-primary-400/30">
+            </Link>
+            <Link
+              to="/for-professionals"
+              className="px-8 py-4 bg-primary-800/50 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-primary-800/70 transition-colors border border-primary-400/30 inline-block"
+            >
               For Professionals
-            </button>
+            </Link>
           </div>
         </div>
       </div>

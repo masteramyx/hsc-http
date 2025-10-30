@@ -115,7 +115,7 @@ fun Application.configureRouting() {
                 val database = DatabaseFactory.getDatabase()
                 val studentQueries = database.studentQueries
                 studentQueries.getAllActiveStudents().executeAsList()
-                
+
                 call.respond(HttpStatusCode.OK, HealthStatus(
                     status = "healthy",
                     version = "1.0.0",
@@ -125,11 +125,31 @@ fun Application.configureRouting() {
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.ServiceUnavailable, HealthStatus(
                     status = "unhealthy",
-                    version = "1.0.0", 
+                    version = "1.0.0",
                     database = "disconnected",
                     timestamp = java.time.Instant.now().toString()
                 ))
             }
+        }
+
+        // SPA Fallback: Catch-all route for client-side routing
+        // This must be last to avoid catching API routes and static assets
+        // Serves index.html for all non-API, non-static routes to enable React Router
+        get("{...}") {
+            val reactDockerPath = File("/app/react-web/build/index.html")
+            val reactLocalPath = File("../react-web/build/index.html")
+            val composeDockerPath = File("/app/web/build/processedResources/js/main/index.html")
+
+            val indexFile = when {
+                reactDockerPath.exists() -> reactDockerPath
+                reactLocalPath.exists() -> reactLocalPath
+                composeDockerPath.exists() -> composeDockerPath
+                else -> {
+                    call.respondText("Frontend build not found", status = HttpStatusCode.NotFound)
+                    return@get
+                }
+            }
+            call.respondFile(indexFile)
         }
     }
 }

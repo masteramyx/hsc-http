@@ -1,36 +1,41 @@
+import { Link } from 'react-router-dom';
+import { ContactForm } from './ContactForm';
+
 export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">SC</span>
             </div>
             <span className="text-2xl font-bold text-gray-900">Shadow Connects</span>
-          </div>
+          </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#features"
+            <Link
+              to="/how-it-works"
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               How It Works
-            </a>
-            <a
-              href="#opportunities"
+            </Link>
+            <Link
+              to="/opportunities"
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               Opportunities
-            </a>
-            <a
-              href="#about"
+            </Link>
+            <Link
+              to="/about"
               className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               About
-            </a>
-            <button className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors">
-              Sign Up
-            </button>
+            </Link>
+            <ContactForm
+              buttonText="Sign Up"
+              buttonClassName="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
+              wrapperClassName=""
+            />
           </div>
           <button className="md:hidden text-gray-700">
             <svg

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ContactForm } from './ContactForm';
 
 export function CTA() {
@@ -16,12 +17,18 @@ export function CTA() {
           <ContactForm />
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+            <Link
+              to="/opportunities"
+              className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all inline-block"
+            >
               Browse Opportunities
-            </button>
-            <button className="px-8 py-4 bg-primary-700/50 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-primary-700/70 transition-colors border border-primary-400/30">
+            </Link>
+            <Link
+              to="/for-professionals"
+              className="px-8 py-4 bg-primary-700/50 backdrop-blur-sm text-white rounded-lg font-semibold text-lg hover:bg-primary-700/70 transition-colors border border-primary-400/30 inline-block"
+            >
               List Your Practice
-            </button>
+            </Link>
           </div>
           <p className="mt-8 text-primary-200 text-sm">
             Free to join • HIPAA compliant • Trusted by healthcare professionals
