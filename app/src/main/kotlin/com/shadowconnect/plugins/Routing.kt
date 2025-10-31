@@ -92,7 +92,43 @@ fun Application.configureRouting() {
             val composeStaticPath = if (composeDockerStaticPath.exists()) composeDockerStaticPath else composeLocalStaticPath
             staticFiles("/static", composeStaticPath)
         }
-        
+
+        // Serve robots.txt for SEO
+        get("/robots.txt") {
+            val robotsDockerPath = File("/app/react-web/build/robots.txt")
+            val robotsLocalPath = File("../react-web/build/robots.txt")
+
+            val robotsFile = when {
+                robotsDockerPath.exists() -> robotsDockerPath
+                robotsLocalPath.exists() -> robotsLocalPath
+                else -> {
+                    call.respondText("User-agent: *\nAllow: /", ContentType.Text.Plain, HttpStatusCode.OK)
+                    return@get
+                }
+            }
+            call.respondFile(robotsFile)
+        }
+
+        // Serve sitemap.xml for SEO
+        get("/sitemap.xml") {
+            val sitemapDockerPath = File("/app/react-web/build/sitemap.xml")
+            val sitemapLocalPath = File("../react-web/build/sitemap.xml")
+
+            val sitemapFile = when {
+                sitemapDockerPath.exists() -> sitemapDockerPath
+                sitemapLocalPath.exists() -> sitemapLocalPath
+                else -> {
+                    call.respondText("Sitemap not found", status = HttpStatusCode.NotFound)
+                    return@get
+                }
+            }
+            call.respondText(
+                sitemapFile.readText(),
+                ContentType.Application.Xml,
+                HttpStatusCode.OK
+            )
+        }
+
         get("/debug-files") {
             val reactWebDir = File("/app/react-web")
             val buildDir = File("/app/react-web/build")

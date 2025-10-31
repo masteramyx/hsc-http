@@ -1,0 +1,15 @@
+# robots.txt for Shadow Connects
+# Allows all search engines to crawl the entire site
+
+User-agent: *
+Allow: /
+
+# Block API endpoints from being indexed
+Disallow: /api/
+
+# Block debug and health check endpoints
+Disallow: /debug-files
+Disallow: /health
+
+# Sitemap location
+Sitemap: https://www.shadowconnects.com/sitemap.xml
