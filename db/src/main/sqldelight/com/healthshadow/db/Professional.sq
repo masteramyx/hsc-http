@@ -1,19 +1,28 @@
 CREATE TABLE IF NOT EXISTS professional
 (
-    id              SERIAL8 PRIMARY KEY,
-    user_id         BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    first_name      varchar(100) NOT NULL,
-    last_name       varchar(100) NOT NULL,
-    phone           VARCHAR(15) NOT NULL,
-    license_number  varchar(50) UNIQUE,
-    specialization  varchar(100),
-    years_experience INTEGER,
-    organization    varchar(200),
-    title           varchar(100),
-    bio             TEXT,
-    verified        BOOLEAN     DEFAULT FALSE,
-    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    id                      SERIAL8 PRIMARY KEY,
+    user_id                 BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_name              varchar(100) NOT NULL,
+    last_name               varchar(100) NOT NULL,
+    phone                   VARCHAR(15) NOT NULL,
+    license_number          varchar(50) UNIQUE,
+    specialization          varchar(100),
+    years_experience        INTEGER,
+    organization            varchar(200),
+    practice_type           varchar(50), -- Enum: hospital, private_practice, clinic, urgent_care, other
+    practice_city           varchar(100),
+    practice_state          varchar(2),
+    practice_address        TEXT,
+    specialities            TEXT, -- JSON array of specialities
+    student_requirements    TEXT, -- requirements description
+    available_days          TEXT, -- JSON Array ["Monday", "Tuesday"]
+    available_times         TEXT,
+    title                   varchar(100),
+    bio                     TEXT,
+    photo_url               TEXT,
+    verified                BOOLEAN     DEFAULT FALSE,
+    created_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Get professional by ID
@@ -56,8 +65,30 @@ ORDER BY p.years_experience DESC;
 
 -- Create professional
 createProfessional:
-INSERT INTO professional (user_id, first_name, last_name, phone, license_number, specialization, years_experience, organization, title, bio)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  INSERT INTO professional (
+      user_id,
+      first_name,
+      last_name,
+      phone,
+      photo_url,
+      medical_license_number,
+      specialty,
+      years_of_experience,
+      board_certifications,
+      title_position,
+      practice_name,
+      practice_type,
+      practice_city,
+      practice_state,
+      practice_address,
+      bio,
+      shadowing_specialties,
+      student_requirements,
+      available_days,
+      available_times,
+      max_students_per_session,
+      duration_options
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Update professional
 updateProfessional:
@@ -80,3 +111,55 @@ UPDATE professional SET
     verified = TRUE,
     updated_at = CURRENT_TIMESTAMP 
 WHERE id = ?;
+
+  -- Update professional profile
+  updateProfessionalProfile:
+  UPDATE professional
+  SET
+      first_name = ?,
+      last_name = ?,
+      phone = ?,
+      photo_url = ?,
+      medical_license_number = ?,
+      specialty = ?,
+      years_of_experience = ?,
+      board_certifications = ?,
+      title_position = ?,
+      practice_name = ?,
+      practice_type = ?,
+      practice_city = ?,
+      practice_state = ?,
+      practice_address = ?,
+      bio = ?,
+      shadowing_specialties = ?,
+      student_requirements = ?,
+      available_days = ?,
+      available_times = ?,
+      max_students_per_session = ?,
+      duration_options = ?
+  WHERE user_id = ?;
+
+  -- Update only photo
+  updateProfessionalPhoto:
+  UPDATE professional
+  SET photo_url = ?
+  WHERE user_id = ?;
+
+  -- Get all professionals (for browsing/search)
+  getAllProfessionals:
+  SELECT * FROM professional;
+
+  -- Search professionals by location
+  searchProfessionalsByLocation:
+  SELECT * FROM professional
+  WHERE practice_city = ? AND practice_state = ?;
+
+  -- Search professionals by specialty
+  searchProfessionalsBySpecialty:
+  SELECT * FROM professional
+  WHERE specialty = ?;
+
+
+
+CREATE INDEX IF NOT EXISTS idx_professional_location ON professional(practice_city, practice_state);
+CREATE INDEX IF NOT EXISTS idx_professional_location ON professional(speciality);

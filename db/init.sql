@@ -32,20 +32,29 @@ CREATE TABLE student
 -- Create professional table
 CREATE TABLE professional
 (
-    id              SERIAL8 PRIMARY KEY,
-    user_id         BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    first_name      varchar(100) NOT NULL,
-    last_name       varchar(100) NOT NULL,
-    phone           VARCHAR(15) NOT NULL,
-    license_number  varchar(50) UNIQUE,
-    specialization  varchar(100),
-    years_experience INTEGER,
-    organization    varchar(200),
-    title           varchar(100),
-    bio             TEXT,
-    verified        BOOLEAN     DEFAULT FALSE,
-    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    id                      SERIAL8 PRIMARY KEY,
+    user_id                 BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_name              varchar(100) NOT NULL,
+    last_name               varchar(100) NOT NULL,
+    phone                   VARCHAR(15) NOT NULL,
+    license_number          varchar(50) UNIQUE,
+    specialization          varchar(100),
+    years_experience        INTEGER,
+    organization            varchar(200),
+    practice_type           varchar(50), -- Enum: hospital, private_practice, clinic, urgent_care, other
+    practice_city           varchar(100),
+    practice_state          varchar(2),
+    practice_address        TEXT,
+    specialities            TEXT, -- JSON array of specialities
+    student_requirements    TEXT, -- requirements description
+    available_days          TEXT, -- JSON Array ["Monday", "Tuesday"]
+    available_times         TEXT,
+    title                   varchar(100),
+    bio                     TEXT,
+    photo_url               TEXT,
+    verified                BOOLEAN     DEFAULT FALSE,
+    created_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Create indexes for better performance
