@@ -5,7 +5,7 @@ import com.shadowconnect.routes.authRouting
 import com.shadowconnect.routes.chatRouting
 import com.shadowconnect.routes.contactRouting
 import com.shadowconnect.routes.fileUploadRouting
-//import com.shadowconnect.routes.professionalRouting
+import com.shadowconnect.routes.professionalRouting
 import com.shadowconnect.db.DatabaseFactory
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -42,7 +42,7 @@ fun Application.configureRouting() {
         chatRouting()
         contactRouting()
         fileUploadRouting()
-//        professionalRouting()
+        professionalRouting()
         
         // This logic handles serving the correct frontend files for different environments.
         // Priority: React frontend > Compose Web frontend

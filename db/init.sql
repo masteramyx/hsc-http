@@ -37,15 +37,16 @@ CREATE TABLE professional
     first_name              varchar(100) NOT NULL,
     last_name               varchar(100) NOT NULL,
     phone                   VARCHAR(15) NOT NULL,
+    professional_type       varchar(50) NOT NULL, -- MD, DO, PA, NP, etc.
     license_number          varchar(50) UNIQUE,
-    specialization          varchar(100),
+    specialization          varchar(100), -- FAMILY_MEDICINE, CARDIOLOGY, etc.
     years_experience        INTEGER,
     organization            varchar(200),
-    practice_type           varchar(50), -- Enum: hospital, private_practice, clinic, urgent_care, other
+    practice_type           varchar(50), -- HOSPITAL, PRIVATE_PRACTICE, CLINIC, etc.
     practice_city           varchar(100),
     practice_state          varchar(2),
     practice_address        TEXT,
-    specialities            TEXT, -- JSON array of specialities
+    specialties             TEXT, -- JSON array of additional specialties
     student_requirements    TEXT, -- requirements description
     available_days          TEXT, -- JSON Array ["Monday", "Tuesday"]
     available_times         TEXT,
@@ -83,8 +84,8 @@ WITH professional_user AS (
     VALUES ('professional@example.com', 'TODO_IMPLEMENT_PASSWORD_HASHING', 'professional')
     RETURNING id
 )
-INSERT INTO professional (user_id, first_name, last_name, phone, license_number, specialization, years_experience, organization, title, verified)
-SELECT id, 'Dr. Jane', 'Smith', '555-0456', 'MD123456', 'Internal Medicine', 8, 'City Hospital', 'Attending Physician', true
+INSERT INTO professional (user_id, first_name, last_name, phone, professional_type, license_number, specialization, years_experience, organization, practice_type, title, verified)
+SELECT id, 'Dr. Jane', 'Smith', '555-0456', 'MD', 'MD123456', 'INTERNAL_MEDICINE', 8, 'City Hospital', 'HOSPITAL', 'Attending Physician', true
 FROM professional_user;
 
 -- Insert admin user (no additional profile needed)

@@ -1,0 +1,79 @@
+package com.shadowconnect.db
+
+import com.shadowconnect.core.model.ProfessionalType
+import com.shadowconnect.core.model.MedicalSpecialty
+import com.shadowconnect.core.model.PracticeType
+
+data class ProfessionalData(
+    val id: Long,
+    val userId: Long,
+    val firstName: String,
+    val lastName: String,
+    val phone: String,
+    val professionalType: ProfessionalType,
+    val licenseNumber: String?,
+    val specialization: MedicalSpecialty?,
+    val yearsExperience: Int?,
+    val organization: String?,
+    val practiceType: PracticeType?,
+    val practiceCity: String?,
+    val practiceState: String?,
+    val practiceAddress: String?,
+    val specialties: String?,
+    val studentRequirements: String?,
+    val availableDays: String?,
+    val availableTimes: String?,
+    val title: String?,
+    val bio: String?,
+    val photoUrl: String?,
+    val verified: Boolean,
+    val email: String,
+    val userType: String,
+    val isActive: Boolean?
+)
+
+interface ProfessionalRepository {
+    fun getAllActiveProfessionals(): List<ProfessionalData>
+    fun getProfessionalById(id: Long): ProfessionalData?
+    fun getProfessionalByUserId(userId: Long): ProfessionalData?
+    fun createProfessional(
+        userId: Long,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        professionalType: ProfessionalType,
+        licenseNumber: String? = null,
+        specialization: MedicalSpecialty? = null,
+        yearsExperience: Int? = null,
+        organization: String? = null,
+        practiceType: PracticeType? = null,
+        practiceCity: String? = null,
+        practiceState: String? = null,
+        practiceAddress: String? = null,
+        title: String? = null,
+        bio: String? = null,
+        photoUrl: String? = null,
+        specialties: String? = null,
+        studentRequirements: String? = null,
+        availableDays: String? = null,
+        availableTimes: String? = null
+    ): Boolean
+    fun updateProfessionalProfile(
+        userId: Long,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        professionalType: ProfessionalType,
+        photoUrl: String? = null,
+        specialization: MedicalSpecialty? = null,
+        practiceType: PracticeType? = null,
+        practiceCity: String? = null,
+        practiceState: String? = null,
+        practiceAddress: String? = null,
+        bio: String? = null,
+        specialties: String? = null,
+        studentRequirements: String? = null,
+        availableDays: String? = null,
+        availableTimes: String? = null
+    ): Boolean
+}

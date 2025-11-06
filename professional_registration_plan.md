@@ -44,11 +44,11 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
   - `R2_BUCKET_NAME` (set to `hsc-dev-photos` for dev, `hsc-prod-photos` for prod)
   - `R2_PUBLIC_URL` (R2 public bucket URL, e.g., `https://pub-abc123.r2.dev`)
 
-### 2.2 Add R2 Client Dependency 
+### 2.2 Add R2 Client Dependency √
 - Add AWS SDK for Kotlin (R2 is S3-compatible)
 - Configure S3 client to point to R2 endpoint: `https://<account-id>.r2.cloudflarestorage.com`
 
-### 2.3 Create R2StorageService (Kotlin)
+### 2.3 Create R2StorageService (Kotlin) √
 - `uploadFile(bytes: ByteArray, contentType: String, extension: String): String`
   - Generates unique filename (UUID + extension)
   - Uploads to R2 bucket using S3-compatible API
@@ -56,37 +56,37 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
 - `deleteFile(filename: String)` - for cleanup/profile updates
 - Handles R2 connection, bucket operations, error handling
 
-### 2.4 Add file upload endpoint (Kotlin)
+### 2.4 Add file upload endpoint (Kotlin) √ 
 - `POST /api/upload/photo`
 - Accept multipart form data
 - Validate file type (jpg, png, webp, max 5MB)
 - Use R2StorageService to upload
 - Return public photo URL in response
 
-### 2.5 Add Ktor content negotiation for multipart
+### 2.5 Add Ktor content negotiation for multipart √
 - Configure multipart in Ktor application
 
-**Note:** Images are served directly from R2's public URL. No backend GET endpoint needed - frontend uses the returned URL directly in `<img>` tags.
+ **Note:** Images are served directly from R2's public URL. No backend GET endpoint needed - frontend uses the returned URL directly in `<img>` tags.
 
 ---
 
 ## Phase 3: Backend API Endpoints (45 mins)
 
-### 3.1 Professional Registration Endpoint
+### 3.1 Professional Registration Endpoint √ 
 - `POST /api/professional/register`
 - Request body: Complete professional profile data (JSON)
 - Validates required fields
 - Creates professional record
 - Returns success/error
 
-### 3.2 Professional Profile Update
+### 3.2 Professional Profile Update √
 - `PUT /api/professional/profile`
 - Protected route (requires authentication)
 - Updates existing professional profile
 
-### 3.3 Get Professional Profile
+### 3.3 Get Professional Profile √
 - `GET /api/professional/profile`
-- Protected route
+- Protected route (requires authentication)
 - Returns current user's professional profile
 
 ---
