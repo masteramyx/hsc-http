@@ -26,6 +26,7 @@ tasks {
 tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":db"))
     implementation(project(":shared"))
     implementation(libs.kotlin.stdlib)
@@ -44,6 +45,9 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.3.12")
     implementation("io.ktor:ktor-client-cio:2.3.12")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+
+    // AWS SDK for R2 Storage
+    implementation(libs.aws.s3)
 
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
