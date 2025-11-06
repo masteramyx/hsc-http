@@ -1,6 +1,9 @@
+@file:JsExport
+
 package com.shadowconnect.shared.model
 
 import kotlinx.serialization.Serializable
+import kotlin.js.JsExport
 
 /**
  * Professional credential types - defines the type of medical professional

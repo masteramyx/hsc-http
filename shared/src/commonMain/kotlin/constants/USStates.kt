@@ -1,4 +1,8 @@
+@file:JsExport
+
 package constants
+
+import kotlin.js.JsExport
 
 /**
  * US State abbreviations in alphabetical order
