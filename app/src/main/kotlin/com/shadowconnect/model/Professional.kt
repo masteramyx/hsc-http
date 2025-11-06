@@ -1,8 +1,8 @@
 package com.shadowconnect.model
 
-import com.shadowconnect.core.model.ProfessionalType
-import com.shadowconnect.core.model.MedicalSpecialty
-import com.shadowconnect.core.model.PracticeType
+import com.shadowconnect.shared.model.ProfessionalType
+import com.shadowconnect.shared.model.MedicalSpecialty
+import com.shadowconnect.shared.model.PracticeType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

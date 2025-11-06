@@ -1,9 +1,9 @@
 package com.shadowconnect.routes
 
 import com.shadowconnect.auth.UserSession
-import com.shadowconnect.core.model.ProfessionalType
-import com.shadowconnect.core.model.MedicalSpecialty
-import com.shadowconnect.core.model.PracticeType
+import com.shadowconnect.shared.model.ProfessionalType
+import com.shadowconnect.shared.model.MedicalSpecialty
+import com.shadowconnect.shared.model.PracticeType
 import com.shadowconnect.db.DatabaseFactory
 import com.shadowconnect.db.ProfessionalRepositoryImpl
 import com.shadowconnect.model.Professional

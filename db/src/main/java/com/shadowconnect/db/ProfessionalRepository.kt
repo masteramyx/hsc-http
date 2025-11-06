@@ -1,8 +1,8 @@
 package com.shadowconnect.db
 
-import com.shadowconnect.core.model.ProfessionalType
-import com.shadowconnect.core.model.MedicalSpecialty
-import com.shadowconnect.core.model.PracticeType
+import com.shadowconnect.shared.model.ProfessionalType
+import com.shadowconnect.shared.model.MedicalSpecialty
+import com.shadowconnect.shared.model.PracticeType
 
 data class ProfessionalData(
     val id: Long,

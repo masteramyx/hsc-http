@@ -26,7 +26,6 @@ tasks {
 tasks.getByName("installDist").mustRunAfter("build")
 
 dependencies {
-    implementation(project(":core"))
     implementation(project(":db"))
     implementation(project(":shared"))
     implementation(libs.kotlin.stdlib)

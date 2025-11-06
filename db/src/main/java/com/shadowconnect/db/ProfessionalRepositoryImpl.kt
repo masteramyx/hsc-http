@@ -1,9 +1,9 @@
 package com.shadowconnect.db
 
 import com.healthshadow.db.HealthShadowDatabase
-import com.shadowconnect.core.model.ProfessionalType
-import com.shadowconnect.core.model.MedicalSpecialty
-import com.shadowconnect.core.model.PracticeType
+import com.shadowconnect.shared.model.ProfessionalType
+import com.shadowconnect.shared.model.MedicalSpecialty
+import com.shadowconnect.shared.model.PracticeType
 
 class ProfessionalRepositoryImpl(
     private val database: HealthShadowDatabase
