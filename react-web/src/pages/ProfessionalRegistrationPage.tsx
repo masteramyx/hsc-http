@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { SEOHead } from '../components/SEOHead';
 // @ts-ignore - Kotlin/JS types
 import { ProfessionalType, MedicalSpecialty, PracticeType, USStates } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.mjs';
@@ -144,44 +144,40 @@ export function ProfessionalRegistrationPage() {
           <div className="max-w-3xl mx-auto">
             {/* Progress Steps */}
             <div className="mb-8">
-              <div className="flex items-center justify-between">
-                {[1, 2, 3, 4].map((step) => (
-                  <div key={step} className="flex-1 flex items-center">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
-                        step < currentStep
-                          ? 'bg-primary-600 text-white'
-                          : step === currentStep
-                          ? 'bg-primary-600 text-white ring-4 ring-primary-200'
-                          : 'bg-gray-300 text-gray-600'
-                      }`}
-                    >
-                      {step < currentStep ? '✓' : step}
-                    </div>
-                    {step < totalSteps && (
-                      <div
-                        className={`flex-1 h-1 mx-2 ${
-                          step < currentStep ? 'bg-primary-600' : 'bg-gray-300'
-                        }`}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div className="flex justify-between mt-4 text-sm font-medium">
-                <span className={currentStep === 1 ? 'text-primary-600' : 'text-gray-600'}>
-                  Basic Info
-                </span>
-                <span className={currentStep === 2 ? 'text-primary-600' : 'text-gray-600'}>
-                  Professional
-                </span>
-                <span className={currentStep === 3 ? 'text-primary-600' : 'text-gray-600'}>
-                  Practice
-                </span>
-                <span className={currentStep === 4 ? 'text-primary-600' : 'text-gray-600'}>
-                  Profile
-                </span>
-              </div>
+                <div className="flex items-center justify-between">
+                    {[1, 2, 3, 4].map((step, index) => (
+                        <Fragment key={step}>
+                            <div className="flex flex-col items-center">
+                                <div
+                                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                                                 step < currentStep
+                                             ? 'bg-primary-600 text-white' 
+                                             : step === currentStep
+                                             ? 'bg-primary-600 text-white ring-4 ring-primary-200'
+                                             : 'bg-gray-300 text-gray-600'
+                                         }`}
+                                >
+                                    {step < currentStep ? '√' : step}
+                                </div>
+                                <span
+                                    className={`mt-4 text-sm font-medium ${
+                                        currentStep === step ? 'text-primary-600' : 'text-gray-600'
+                                    }`}
+                                >
+              {['Basic Info', 'Professional', 'Practice', 'Profile'][index]}
+            </span>
+                            </div>
+                            {/* Connecting line between steps */}
+                            {index < 3 && (
+                                <div
+                                    className={`flex-1 h-1 mx-4 -mt-6 ${
+                                        step < currentStep ? 'bg-primary-600' : 'bg-gray-300'
+                                    }`}
+                                />
+                            )}
+                        </Fragment>
+                    ))}
+                </div>
             </div>
 
             {/* Form Card */}
