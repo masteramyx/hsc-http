@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { SEOHead } from '../components/SEOHead';
 
 export function ForProfessionalsPage() {
+  const navigate = useNavigate();
   return (
     <>
       <SEOHead
@@ -272,7 +274,10 @@ export function ForProfessionalsPage() {
             <p className="text-xl text-primary-100 mb-6">
               Join hundreds of healthcare professionals making a difference in students' lives.
             </p>
-            <button className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg">
+            <button
+              onClick={() => navigate('/register/professional')}
+              className="px-8 py-4 bg-white text-primary-700 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg"
+            >
               Create Professional Account
             </button>
             <p className="mt-4 text-primary-200 text-sm">

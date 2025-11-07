@@ -9,6 +9,7 @@ import { OpportunitiesPage } from './pages/OpportunitiesPage';
 import { AboutPage } from './pages/AboutPage';
 import { ForStudentsPage } from './pages/ForStudentsPage';
 import { ForProfessionalsPage } from './pages/ForProfessionalsPage';
+import { ProfessionalRegistrationPage } from './pages/ProfessionalRegistrationPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/for-students" element={<ForStudentsPage />} />
               <Route path="/for-professionals" element={<ForProfessionalsPage />} />
+              <Route path="/register/professional" element={<ProfessionalRegistrationPage />} />
             </Routes>
           </main>
           <Footer />
