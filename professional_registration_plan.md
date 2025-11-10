@@ -96,28 +96,28 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
 ### 4.1 Create Registration Wizard Component
 `react-web/src/components/ProfessionalRegistrationWizard.tsx`
 
-**Step 1: Account Creation**
+**Step 1: Account Creation** √ 
 - Email, Password, Confirm Password
 - Creates user account with type='professional'
 
-**Step 2: Personal Information**
+**Step 2: Personal Information** √ 
 - First Name, Last Name, Phone
 - Photo upload (with preview)
 
-**Step 3: Credentials**
+**Step 3: Credentials** √
 - Medical License Number
 - Primary Specialty (dropdown)
 - Years of Experience
 - Board Certifications (optional)
-- Title/Position
 
-**Step 4: Practice Information**
+**Step 4: Practice Information** √
 - Practice/Hospital Name
 - Practice Type (dropdown)
 - City, State
-- Address (optional)
+- Address
+- Title/Position
 
-**Step 5: Shadowing Details**
+**Step 5: Shadowing Details** 
 - Bio/About Me (textarea)
 - Specialties Offered (multi-select)
 - Student Requirements (checkboxes + custom text)

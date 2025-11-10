@@ -1,5 +1,6 @@
 import { useState, Fragment } from 'react';
 import { SEOHead } from '../components/SEOHead';
+import { PhotoUpload } from '../components/PhotoUpload';
 // @ts-ignore - Kotlin/JS types
 import { ProfessionalType, MedicalSpecialty, PracticeType, USStates } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.mjs';
 
@@ -9,6 +10,7 @@ type FormData = {
   lastName: string;
   email: string;
   phone: string;
+  photo: File | null;
   password: string;
   confirmPassword: string;
 
@@ -26,6 +28,7 @@ type FormData = {
   practiceCity: string;
   practiceState: string;
   practiceZip: string;
+  titlePosition: string;
 
   // Step 4: Profile
   bio: string;
@@ -37,6 +40,7 @@ const INITIAL_FORM_DATA: FormData = {
   lastName: '',
   email: '',
   phone: '',
+  photo: null,
   password: '',
   confirmPassword: '',
   professionalType: '',
@@ -50,6 +54,7 @@ const INITIAL_FORM_DATA: FormData = {
   practiceCity: '',
   practiceState: '',
   practiceZip: '',
+  titlePosition: '',
   bio: '',
   availabilityNotes: '',
 };
@@ -109,6 +114,7 @@ export function ProfessionalRegistrationPage() {
       if (!formData.practiceCity.trim()) newErrors.practiceCity = 'City is required';
       if (!formData.practiceState) newErrors.practiceState = 'State is required';
       if (!formData.practiceZip.trim()) newErrors.practiceZip = 'ZIP code is required';
+      if (!formData.titlePosition.trim()) newErrors.titlePosition = 'Title/Position is required';
     } else if (step === 4) {
       if (!formData.bio.trim()) newErrors.bio = 'Professional bio is required';
     }
@@ -145,6 +151,7 @@ Registration Data Collected:
 Name: ${formData.firstName} ${formData.lastName}
 Email: ${formData.email}
 Phone: ${formData.phone}
+Photo: ${formData.photo ? formData.photo.name + ' (' + Math.round(formData.photo.size / 1024) + 'KB)' : '(not uploaded)'}
 Password: ${formData.password ? '(set - ' + formData.password.length + ' chars)' : '(not set)'}
 
 === PROFESSIONAL DETAILS ===
@@ -161,6 +168,7 @@ Address: ${formData.practiceAddress}
 City: ${formData.practiceCity}
 State: ${formData.practiceState}
 ZIP: ${formData.practiceZip}
+Title/Position: ${formData.titlePosition}
 
 === PROFILE ===
 Bio: ${formData.bio.substring(0, 100)}${formData.bio.length > 100 ? '...' : ''}
@@ -295,6 +303,20 @@ Backend integration pending...
                       {errors.phone && (
                         <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
                       )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Photo (Optional)
+                      </label>
+                      <PhotoUpload
+                        value={formData.photo}
+                        onChange={(file) => setFormData((prev) => ({ ...prev, photo: file }))}
+                        error={errors.photo}
+                      />
+                      <p className="text-gray-500 text-sm mt-2">
+                        Upload a professional headshot to help students recognize you
+                      </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-6">
@@ -567,6 +589,24 @@ Backend integration pending...
                           <p className="text-red-500 text-sm mt-1">{errors.practiceZip}</p>
                         )}
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Title/Position *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.titlePosition}
+                        onChange={(e) => handleInputChange('titlePosition', e.target.value)}
+                        placeholder="e.g., Attending Physician, Chief Resident, etc."
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.titlePosition ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.titlePosition && (
+                        <p className="text-red-500 text-sm mt-1">{errors.titlePosition}</p>
+                      )}
                     </div>
                   </div>
                 </div>
