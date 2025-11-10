@@ -9,6 +9,8 @@ type FormData = {
   lastName: string;
   email: string;
   phone: string;
+  password: string;
+  confirmPassword: string;
 
   // Step 2: Professional Details
   professionalType: string;
@@ -35,6 +37,8 @@ const INITIAL_FORM_DATA: FormData = {
   lastName: '',
   email: '',
   phone: '',
+  password: '',
+  confirmPassword: '',
   professionalType: '',
   licenseNumber: '',
   licenseState: '',
@@ -87,6 +91,11 @@ export function ProfessionalRegistrationPage() {
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
         newErrors.email = 'Invalid email format';
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+      if (!formData.password) newErrors.password = 'Password is required';
+      else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+      if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
+      else if (formData.password !== formData.confirmPassword)
+        newErrors.confirmPassword = 'Passwords do not match';
     } else if (step === 2) {
       if (!formData.professionalType) newErrors.professionalType = 'Professional type is required';
       if (!formData.licenseNumber.trim()) newErrors.licenseNumber = 'License number is required';
@@ -123,7 +132,44 @@ export function ProfessionalRegistrationPage() {
 
     // TODO: Submit to backend API
     console.log('Submitting registration:', formData);
-    alert('Registration submitted! (Backend integration pending)');
+
+    // Comprehensive data display for validation
+    const professionalTypeDisplay = professionalTypes.find((t: any) => t.a1_1 === formData.professionalType)?.displayName || formData.professionalType;
+    const specialtyDisplay = medicalSpecialties.find((s: any) => s.a1_1 === formData.medicalSpecialty)?.displayName || formData.medicalSpecialty;
+    const practiceTypeDisplay = practiceTypes.find((t: any) => t.a1_1 === formData.practiceType)?.displayName || formData.practiceType;
+
+    const message = `
+Registration Data Collected:
+
+=== BASIC INFORMATION ===
+Name: ${formData.firstName} ${formData.lastName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Password: ${formData.password ? '(set - ' + formData.password.length + ' chars)' : '(not set)'}
+
+=== PROFESSIONAL DETAILS ===
+Professional Type: ${professionalTypeDisplay}
+License Number: ${formData.licenseNumber}
+License State: ${formData.licenseState}
+Medical Specialty: ${specialtyDisplay}
+Years of Experience: ${formData.yearsExperience}
+
+=== PRACTICE INFORMATION ===
+Practice Type: ${practiceTypeDisplay}
+Practice Name: ${formData.practiceName}
+Address: ${formData.practiceAddress}
+City: ${formData.practiceCity}
+State: ${formData.practiceState}
+ZIP: ${formData.practiceZip}
+
+=== PROFILE ===
+Bio: ${formData.bio.substring(0, 100)}${formData.bio.length > 100 ? '...' : ''}
+Availability Notes: ${formData.availabilityNotes || '(none)'}
+
+Backend integration pending...
+    `.trim();
+
+    alert(message);
   };
 
   return (
@@ -249,6 +295,41 @@ export function ProfessionalRegistrationPage() {
                       {errors.phone && (
                         <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
                       )}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Password *
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.password ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.password && (
+                          <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Confirm Password *
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.confirmPassword}
+                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.confirmPassword && (
+                          <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
