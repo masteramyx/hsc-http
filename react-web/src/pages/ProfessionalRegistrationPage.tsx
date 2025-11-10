@@ -57,23 +57,17 @@ export function ProfessionalRegistrationPage() {
 
   const totalSteps = 4;
 
-  // Get all professional types from Kotlin enum
-  const professionalTypes = Object.values(ProfessionalType).filter(
-    (val) => typeof val === 'object' && val !== null
-  );
+  // Get all professional types from Kotlin enum using the standard Kotlin enum API
+  const professionalTypes = ProfessionalType.values();
 
   // Get all medical specialties from Kotlin enum
-  const medicalSpecialties = Object.values(MedicalSpecialty).filter(
-    (val) => typeof val === 'object' && val !== null
-  );
+  const medicalSpecialties = MedicalSpecialty.values();
 
   // Get all practice types from Kotlin enum
-  const practiceTypes = Object.values(PracticeType).filter(
-    (val) => typeof val === 'object' && val !== null
-  );
+  const practiceTypes = PracticeType.values();
 
-  // Get all US states from Kotlin constants
-  const usStates = USStates.getInstance().ALL.z2_1 || []; // Access ArrayList size/elements
+  // Get all US states from Kotlin constants using stable API
+  const usStates = USStates.getInstance().getAll();
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

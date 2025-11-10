@@ -8,13 +8,25 @@ import kotlin.js.JsExport
  * US State abbreviations in alphabetical order
  */
 object USStates {
-    val ALL = listOf(
+    private val statesList = listOf(
         "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
         "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
         "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
         "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
         "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
     )
+
+    /**
+     * Returns all US state abbreviations as an Array.
+     * Stable API for JavaScript consumption.
+     */
+    fun getAll(): Array<String> = statesList.toTypedArray()
+
+    /**
+     * Legacy property for Kotlin JVM usage.
+     * Use getAll() for JavaScript.
+     */
+    val ALL = statesList
 
     val NAMES = mapOf(
         "AL" to "Alabama",
