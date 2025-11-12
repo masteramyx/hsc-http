@@ -1,30 +1,8 @@
 import { useState, Fragment } from 'react';
 import { SEOHead } from '../components/SEOHead';
 import { PhotoUpload } from '../components/PhotoUpload';
-// @ts-ignore - Kotlin/JS types
-import { ProfessionalType, MedicalSpecialty, PracticeType, USStates } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.mjs';
 
-// Days of the week constants
-const DAYS_OF_WEEK = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
-] as const;
-
-type DayOfWeek = typeof DAYS_OF_WEEK[number];
-
-// Time of day constants
-const TIME_RANGES = [
-  'Morning (6am-12pm)',
-  'Afternoon (12pm-6pm)',
-  'Evening (6pm-12am)'
-] as const;
-
-type TimeRange = typeof TIME_RANGES[number];
+import { ProfessionalType, MedicalSpecialty, PracticeType, USStates, DayOfWeek, TimeRange } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 
 // Availability for a specific day
 type DayAvailability = {
@@ -109,6 +87,9 @@ export function ProfessionalRegistrationPage() {
 
   // Get all US states from Kotlin constants using stable API
   const usStates = USStates.getInstance().getAll();
+
+  const daysOfWeek = DayOfWeek.values()
+  const timeRanges = TimeRange.values()
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -709,7 +690,7 @@ Backend integration pending...
                         Choose the days you're typically available to host shadow students
                       </p>
                       <div className="space-y-3">
-                        {DAYS_OF_WEEK.map((day) => {
+                        {daysOfWeek.map((day: DayOfWeek) => {
                           const dayAvailability = formData.availability.find(avail => avail.day === day);
                           // Explicit type: Converts to boolean (true/false), not "truthy/falsy"
                           const isDaySelected = !!dayAvailability;
@@ -724,15 +705,15 @@ Backend integration pending...
                                   onChange={() => handleDayToggle(day)}
                                   className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                                 />
-                                <span className="ml-3 text-gray-900 font-medium">{day}</span>
+                                <span className="ml-3 text-gray-900 font-medium">{day.displayName}</span>
                               </label>
 
                               {/* Time Range Checkboxes - Only show if day is selected */}
                               {isDaySelected && (
                                 <div className="ml-12 mt-2 space-y-2">
-                                  {TIME_RANGES.map((timeRange) => (
+                                  {timeRanges.map((timeRange: TimeRange) => (
                                     <label
-                                      key={timeRange}
+                                      key={timeRange.displayName}
                                       className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded"
                                     >
                                       <input
@@ -741,7 +722,7 @@ Backend integration pending...
                                         onChange={() => handleTimeRangeToggle(day, timeRange)}
                                         className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                                       />
-                                      <span className="ml-2 text-sm text-gray-700">{timeRange}</span>
+                                      <span className="ml-2 text-sm text-gray-700">{timeRange.displayName}</span>
                                     </label>
                                   ))}
                                 </div>

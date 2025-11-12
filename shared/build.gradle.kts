@@ -14,6 +14,16 @@ kotlin {
         browser()
         binaries.library()
         useEsModules()  // Generate ES modules instead of UMD
+
+        compilations.all {
+            kotlinOptions {
+                moduleKind = "es"
+                sourceMap = true
+                sourceMapEmbedSources = "always"
+            }
+        }
+
+        generateTypeScriptDefinitions()
     }
 
     sourceSets {
