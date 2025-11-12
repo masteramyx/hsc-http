@@ -4,6 +4,34 @@ import { PhotoUpload } from '../components/PhotoUpload';
 // @ts-ignore - Kotlin/JS types
 import { ProfessionalType, MedicalSpecialty, PracticeType, USStates } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.mjs';
 
+// Days of the week constants
+const DAYS_OF_WEEK = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
+] as const;
+
+type DayOfWeek = typeof DAYS_OF_WEEK[number];
+
+// Time of day constants
+const TIME_RANGES = [
+  'Morning (6am-12pm)',
+  'Afternoon (12pm-6pm)',
+  'Evening (6pm-12am)'
+] as const;
+
+type TimeRange = typeof TIME_RANGES[number];
+
+// Availability for a specific day
+type DayAvailability = {
+  day: DayOfWeek;
+  timeRanges: TimeRange[];
+};
+
 type FormData = {
   // Step 1: Basic Information
   firstName: string;
@@ -30,7 +58,10 @@ type FormData = {
   practiceZip: string;
   titlePosition: string;
 
-  // Step 4: Profile
+  // Step 4: Availability
+  availability: DayAvailability[];
+
+  // Step 5: Profile
   bio: string;
   availabilityNotes: string;
 };
@@ -55,6 +86,7 @@ const INITIAL_FORM_DATA: FormData = {
   practiceState: '',
   practiceZip: '',
   titlePosition: '',
+  availability: [],
   bio: '',
   availabilityNotes: '',
 };
@@ -64,7 +96,7 @@ export function ProfessionalRegistrationPage() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   // Get all professional types from Kotlin enum using the standard Kotlin enum API
   const professionalTypes = ProfessionalType.values();
@@ -84,6 +116,53 @@ export function ProfessionalRegistrationPage() {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
+  };
+
+  // Toggle a day in the availability array
+  const handleDayToggle = (day: DayOfWeek) => {
+      setFormData((prev) => {
+          // If day already selected - then unselect
+          const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
+          const newAvailability = isCurrentlySelected
+              ? prev.availability.filter(selectedDay => selectedDay.day !== day)
+              : prev.availability.concat({day, timeRanges: []});
+           return {...prev, availability: newAvailability }
+      });
+
+      if(errors.availability) {
+          setErrors((prev) => ({...prev, availability: undefined}))
+      }
+  };
+
+  // This function should toggle a time range within a specific day's timeRanges array
+  const handleTimeRangeToggle = (day: DayOfWeek, timeRange: TimeRange) => {
+    setFormData((prev) => {
+        const newAvailability = prev.availability.map((dayAvail) => {
+            // is this the same day?
+            if (dayAvail.day === day) {
+                // does time exist already?
+                const hasTimeRange = dayAvail.timeRanges.includes(timeRange);
+
+                // if exists already - remove
+                const newTimeRanges = hasTimeRange
+                    ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
+                    : [...dayAvail.timeRanges, timeRange];
+
+                // return updated day object
+                return {...dayAvail, timeRanges: newTimeRanges}
+            }
+
+            // bug - not the right day....do nothing
+            return dayAvail;
+        });
+
+        return {...prev, availability: newAvailability};
+    });
+
+    // Clear errors
+      if(errors.availability) {
+          setErrors((prev) => ({...prev, availability: undefined}))
+      }
   };
 
   const validateStep = (step: number): boolean => {
@@ -116,6 +195,11 @@ export function ProfessionalRegistrationPage() {
       if (!formData.practiceZip.trim()) newErrors.practiceZip = 'ZIP code is required';
       if (!formData.titlePosition.trim()) newErrors.titlePosition = 'Title/Position is required';
     } else if (step === 4) {
+      // Require at least one day to be selected
+      if (formData.availability.length === 0) {
+        newErrors.availability = 'Please select at least one day you are available';
+      }
+    } else if (step === 5) {
       if (!formData.bio.trim()) newErrors.bio = 'Professional bio is required';
     }
 
@@ -193,13 +277,13 @@ Backend integration pending...
             {/* Progress Steps */}
             <div className="mb-8">
                 <div className="flex items-center justify-between">
-                    {[1, 2, 3, 4].map((step, index) => (
+                    {[1, 2, 3, 4, 5].map((step, index) => (
                         <Fragment key={step}>
                             <div className="flex flex-col items-center">
                                 <div
                                 className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
                                                  step < currentStep
-                                             ? 'bg-primary-600 text-white' 
+                                             ? 'bg-primary-600 text-white'
                                              : step === currentStep
                                              ? 'bg-primary-600 text-white ring-4 ring-primary-200'
                                              : 'bg-gray-300 text-gray-600'
@@ -212,11 +296,11 @@ Backend integration pending...
                                         currentStep === step ? 'text-primary-600' : 'text-gray-600'
                                     }`}
                                 >
-              {['Basic Info', 'Professional', 'Practice', 'Profile'][index]}
+              {['Basic Info', 'Professional', 'Practice', 'Availability', 'Profile'][index]}
             </span>
                             </div>
                             {/* Connecting line between steps */}
-                            {index < 3 && (
+                            {index < 4 && (
                                 <div
                                     className={`flex-1 h-1 mx-4 -mt-6 ${
                                         step < currentStep ? 'bg-primary-600' : 'bg-gray-300'
@@ -612,8 +696,70 @@ Backend integration pending...
                 </div>
               )}
 
-              {/* Step 4: Profile */}
+              {/* Step 4: Availability */}
               {currentStep === 4 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Availability</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-4">
+                        Select Available Days *
+                      </label>
+                      <p className="text-gray-600 text-sm mb-4">
+                        Choose the days you're typically available to host shadow students
+                      </p>
+                      <div className="space-y-3">
+                        {DAYS_OF_WEEK.map((day) => {
+                          const dayAvailability = formData.availability.find(avail => avail.day === day);
+                          // Explicit type: Converts to boolean (true/false), not "truthy/falsy"
+                          const isDaySelected = !!dayAvailability;
+
+                          return (
+                            <div key={day}>
+                              {/* Day Checkbox */}
+                              <label className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={isDaySelected}
+                                  onChange={() => handleDayToggle(day)}
+                                  className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                />
+                                <span className="ml-3 text-gray-900 font-medium">{day}</span>
+                              </label>
+
+                              {/* Time Range Checkboxes - Only show if day is selected */}
+                              {isDaySelected && (
+                                <div className="ml-12 mt-2 space-y-2">
+                                  {TIME_RANGES.map((timeRange) => (
+                                    <label
+                                      key={timeRange}
+                                      className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={dayAvailability.timeRanges.includes(timeRange)}
+                                        onChange={() => handleTimeRangeToggle(day, timeRange)}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                      />
+                                      <span className="ml-2 text-sm text-gray-700">{timeRange}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {errors.availability && (
+                        <p className="text-red-500 text-sm mt-2">{errors.availability}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Profile */}
+              {currentStep === 5 && (
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-6">Complete Your Profile</h2>
                   <div className="space-y-6">

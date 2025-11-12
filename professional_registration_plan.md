@@ -117,8 +117,8 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
 - Address
 - Title/Position
 
-**Step 5: Shadowing Details** 
-- Bio/About Me (textarea)
+**Step 5: Shadowing Details**  
+- Bio/About Me (textarea) 
 - Specialties Offered (multi-select)
 - Student Requirements (checkboxes + custom text)
 - Availability (days checkboxes, times checkboxes)
