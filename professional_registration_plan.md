@@ -117,7 +117,7 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
 - Address
 - Title/Position
 
-**Step 5: Shadowing Details**  
+**Step 5: Shadowing Details** √
 - Bio/About Me (textarea) 
 - Specialties Offered (multi-select)
 - Student Requirements (checkboxes + custom text)
@@ -125,26 +125,26 @@ CREATE INDEX idx_professional_specialty ON professional(specialty);
 - Max Students per Session (number input)
 - Duration Options (checkboxes)
 
-**Step 6: Review & Submit**
+**Step 6: Review & Submit** √ 
 - Display all entered information
 - Terms & Conditions checkbox
 - Submit button
 
-**Wizard Features:**
+**Wizard Features:** √ 
 - Progress indicator (1/6, 2/6, etc.)
 - Back/Next navigation
 - Client-side validation per step
 - Form state management (useState)
 - Photo upload with preview
 
-### 4.2 Create Photo Upload Component
+### 4.2 Create Photo Upload Component √ 
 `react-web/src/components/PhotoUpload.tsx`
 - Drag & drop or click to upload
 - Image preview
 - Size/type validation
 - Upload progress indicator
 
-### 4.3 Create Specialty Multi-Select Component
+### 4.3 Create Specialty Multi-Select Component ?
 `react-web/src/components/SpecialtySelect.tsx`
 - Searchable dropdown
 - Multiple selection

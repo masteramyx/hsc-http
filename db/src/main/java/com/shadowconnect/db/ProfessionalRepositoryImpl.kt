@@ -200,4 +200,74 @@ class ProfessionalRepositoryImpl(
             false
         }
     }
+
+    /**
+     * Atomically register a new professional - creates user + professional profile in single transaction.
+     * If any step fails, entire transaction rolls back automatically.
+     */
+    override suspend fun registerNewProfessional(
+        email: String,
+        passwordHash: String,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        professionalType: ProfessionalType,
+        licenseNumber: String,
+        licenseState: String,
+        specialization: MedicalSpecialty,
+        yearsExperience: Int,
+        practiceType: PracticeType,
+        practiceName: String,
+        practiceAddress: String,
+        practiceCity: String,
+        practiceState: String,
+        practiceZip: String,
+        titlePosition: String,
+        availabilityJson: String,
+        bio: String,
+        availabilityNotes: String?,
+        photoUrl: String?
+    ): RegistrationResult {
+        return database.transactionWithResult {
+            // Step 1: Create user account
+            val userId = database.userQueries.createUser(
+                email = email,
+                password_hash = passwordHash,
+                user_type = "professional"
+            ).executeAsOne()
+
+            // Step 2: Create professional profile linked to user
+            database.professionalQueries.createProfessional(
+                user_id = userId,
+                first_name = firstName,
+                last_name = lastName,
+                phone = phone,
+                professional_type = professionalType.name,
+                license_number = licenseNumber,
+                specialization = specialization.name,
+                years_experience = yearsExperience,
+                organization = practiceName,  // Using practiceName as organization
+                practice_type = practiceType.name,
+                practice_city = practiceCity,
+                practice_state = practiceState,
+                practice_address = practiceAddress,
+                title = titlePosition,
+                bio = bio,
+                photo_url = photoUrl,
+                specialties = null,  // Can be added later
+                student_requirements = availabilityNotes,
+                available_days = availabilityJson,
+                available_times = null  // Using availabilityJson for structured availability
+            )
+
+            // Step 3: Get the professional ID that was just created
+            val professionalId = database.professionalQueries.getProfessionalByUserId(userId)
+                .executeAsOne()
+                .id
+
+            // Return both IDs
+            // If we reach here, transaction commits automatically
+            RegistrationResult(userId = userId, professionalId = professionalId)
+        }
+    }
 }

@@ -4,6 +4,14 @@ import com.shadowconnect.shared.model.ProfessionalType
 import com.shadowconnect.shared.model.MedicalSpecialty
 import com.shadowconnect.shared.model.PracticeType
 
+/**
+ * Result of atomic professional registration containing both user and professional IDs
+ */
+data class RegistrationResult(
+    val userId: Long,
+    val professionalId: Long
+)
+
 data class ProfessionalData(
     val id: Long,
     val userId: Long,
@@ -76,4 +84,35 @@ interface ProfessionalRepository {
         availableDays: String? = null,
         availableTimes: String? = null
     ): Boolean
+
+    /**
+     * Atomically register a new professional user - creates both user account and professional profile
+     * in a single transaction. Either both succeed or both fail (rollback).
+     *
+     * @return RegistrationResult containing both user ID and professional ID
+     * @throws Exception if registration fails (will trigger transaction rollback)
+     */
+    suspend fun registerNewProfessional(
+        email: String,
+        passwordHash: String,
+        firstName: String,
+        lastName: String,
+        phone: String,
+        professionalType: ProfessionalType,
+        licenseNumber: String,
+        licenseState: String,
+        specialization: MedicalSpecialty,
+        yearsExperience: Int,
+        practiceType: PracticeType,
+        practiceName: String,
+        practiceAddress: String,
+        practiceCity: String,
+        practiceState: String,
+        practiceZip: String,
+        titlePosition: String,
+        availabilityJson: String,  // JSON serialized DayAvailability list
+        bio: String,
+        availabilityNotes: String? = null,
+        photoUrl: String? = null
+    ): RegistrationResult
 }
