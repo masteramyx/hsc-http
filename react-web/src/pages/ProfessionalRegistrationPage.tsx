@@ -201,48 +201,54 @@ export function ProfessionalRegistrationPage() {
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
-    // TODO: Submit to backend API
     console.log('Submitting registration:', formData);
 
-    // Comprehensive data display for validation
-    const professionalTypeDisplay = professionalTypes.find((t: any) => t.a1_1 === formData.professionalType)?.displayName || formData.professionalType;
-    const specialtyDisplay = medicalSpecialties.find((s: any) => s.a1_1 === formData.medicalSpecialty)?.displayName || formData.medicalSpecialty;
-    const practiceTypeDisplay = practiceTypes.find((t: any) => t.a1_1 === formData.practiceType)?.displayName || formData.practiceType;
+    try {
+        const response = await fetch('/api/v1/professional/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                phone: formData.phone,
+                photo_url: formData.photo ? 'TODO' : null,
+                professional_type: formData.professionalType,
+                license_number: formData.licenseNumber,
+                license_state: formData.licenseState,
+                specialization: formData.medicalSpecialty,
+                years_experience: parseInt(formData.yearsExperience),
+                practice_type: formData.practiceType,
+                practice_name: formData.practiceName,
+                practice_address: formData.practiceAddress,
+                practice_city: formData.practiceCity,
+                practice_state: formData.practiceState,
+                practice_zip: formData.practiceZip,
+                title_position: formData.titlePosition,
+                availability: formData.availability.map( avail => ( {
+                    day: avail.day.name,
+                    time_ranges: avail.timeRanges.map(tr => tr.name)
+                })),
+                bio: formData.bio,
+                availability_notes: formData.availabilityNotes || null,
+            }),
+        });
 
-    const message = `
-Registration Data Collected:
+        const result = await response.json();
 
-=== BASIC INFORMATION ===
-Name: ${formData.firstName} ${formData.lastName}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Photo: ${formData.photo ? formData.photo.name + ' (' + Math.round(formData.photo.size / 1024) + 'KB)' : '(not uploaded)'}
-Password: ${formData.password ? '(set - ' + formData.password.length + ' chars)' : '(not set)'}
-
-=== PROFESSIONAL DETAILS ===
-Professional Type: ${professionalTypeDisplay}
-License Number: ${formData.licenseNumber}
-License State: ${formData.licenseState}
-Medical Specialty: ${specialtyDisplay}
-Years of Experience: ${formData.yearsExperience}
-
-=== PRACTICE INFORMATION ===
-Practice Type: ${practiceTypeDisplay}
-Practice Name: ${formData.practiceName}
-Address: ${formData.practiceAddress}
-City: ${formData.practiceCity}
-State: ${formData.practiceState}
-ZIP: ${formData.practiceZip}
-Title/Position: ${formData.titlePosition}
-
-=== PROFILE ===
-Bio: ${formData.bio.substring(0, 100)}${formData.bio.length > 100 ? '...' : ''}
-Availability Notes: ${formData.availabilityNotes || '(none)'}
-
-Backend integration pending...
-    `.trim();
-
-    alert(message);
+        if (result.success) {
+            // success - show success message and redirect
+            console.log('Success!', result)
+        } else {
+            // failure - show error
+            console.log('Failure!', result.message)
+        }
+    } catch (error) {
+        console.log('Network Error: ', error)
+    }
   };
 
   return (
@@ -440,7 +446,7 @@ Backend integration pending...
                       >
                         <option value="">Select professional type...</option>
                         {professionalTypes.map((type: any) => (
-                          <option key={type.a1_1} value={type.a1_1}>
+                          <option key={type.name} value={type.name}>
                             {type.displayName}
                           </option>
                         ))}
@@ -504,7 +510,7 @@ Backend integration pending...
                       >
                         <option value="">Select specialty...</option>
                         {medicalSpecialties.map((specialty: any) => (
-                          <option key={specialty.a1_1} value={specialty.a1_1}>
+                          <option key={specialty.name} value={specialty.name}>
                             {specialty.displayName}
                           </option>
                         ))}
@@ -554,7 +560,7 @@ Backend integration pending...
                       >
                         <option value="">Select practice type...</option>
                         {practiceTypes.map((type: any) => (
-                          <option key={type.a1_1} value={type.a1_1}>
+                          <option key={type.name} value={type.name}>
                             {type.displayName}
                           </option>
                         ))}
@@ -793,13 +799,13 @@ Backend integration pending...
                         </p>
                         <p>
                           <span className="font-semibold">Professional Type:</span>{' '}
-                          {professionalTypes.find((t: any) => t.a1_1 === formData.professionalType)
+                          {professionalTypes.find((t: any) => t.name === formData.professionalType)
                             ?.displayName || formData.professionalType}
                         </p>
                         <p>
                           <span className="font-semibold">Specialty:</span>{' '}
                           {medicalSpecialties.find(
-                            (s: any) => s.a1_1 === formData.medicalSpecialty
+                            (s: any) => s.name === formData.medicalSpecialty
                           )?.displayName || formData.medicalSpecialty}
                         </p>
                         <p>
