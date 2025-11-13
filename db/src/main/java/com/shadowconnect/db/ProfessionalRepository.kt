@@ -65,7 +65,7 @@ interface ProfessionalRepository {
         studentRequirements: String? = null,
         availableDays: String? = null,
         availableTimes: String? = null
-    ): Boolean
+    ): Long
     fun updateProfessionalProfile(
         userId: Long,
         firstName: String,

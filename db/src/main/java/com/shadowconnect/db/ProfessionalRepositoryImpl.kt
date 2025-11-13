@@ -126,35 +126,29 @@ class ProfessionalRepositoryImpl(
         studentRequirements: String?,
         availableDays: String?,
         availableTimes: String?
-    ): Boolean {
-        return try {
-            database.professionalQueries.createProfessional(
-                user_id = userId,
-                first_name = firstName,
-                last_name = lastName,
-                phone = phone,
-                professional_type = professionalType.name,
-                license_number = licenseNumber,
-                specialization = specialization?.name,
-                years_experience = yearsExperience,
-                organization = organization,
-                practice_type = practiceType?.name,
-                practice_city = practiceCity,
-                practice_state = practiceState,
-                practice_address = practiceAddress,
-                title = title,
-                bio = bio,
-                photo_url = photoUrl,
-                specialties = specialties,
-                student_requirements = studentRequirements,
-                available_days = availableDays,
-                available_times = availableTimes
-            )
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
+    ): Long {
+        return database.professionalQueries.createProfessional(
+            user_id = userId,
+            first_name = firstName,
+            last_name = lastName,
+            phone = phone,
+            professional_type = professionalType.name,
+            license_number = licenseNumber,
+            specialization = specialization?.name,
+            years_experience = yearsExperience,
+            organization = organization,
+            practice_type = practiceType?.name,
+            practice_city = practiceCity,
+            practice_state = practiceState,
+            practice_address = practiceAddress,
+            title = title,
+            bio = bio,
+            photo_url = photoUrl,
+            specialties = specialties,
+            student_requirements = studentRequirements,
+            available_days = availableDays,
+            available_times = availableTimes
+        ).executeAsOne()
     }
 
     override fun updateProfessionalProfile(
@@ -236,8 +230,8 @@ class ProfessionalRepositoryImpl(
                 user_type = "professional"
             ).executeAsOne()
 
-            // Step 2: Create professional profile linked to user
-            database.professionalQueries.createProfessional(
+            // Step 2: Create professional profile linked to user and get returned ID
+            val professionalId = database.professionalQueries.createProfessional(
                 user_id = userId,
                 first_name = firstName,
                 last_name = lastName,
@@ -258,12 +252,7 @@ class ProfessionalRepositoryImpl(
                 student_requirements = availabilityNotes,
                 available_days = availabilityJson,
                 available_times = null  // Using availabilityJson for structured availability
-            )
-
-            // Step 3: Get the professional ID that was just created
-            val professionalId = database.professionalQueries.getProfessionalByUserId(userId)
-                .executeAsOne()
-                .id
+            ).executeAsOne()
 
             // Return both IDs
             // If we reach here, transaction commits automatically
