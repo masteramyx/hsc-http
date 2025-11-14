@@ -1,5 +1,5 @@
 # Use Eclipse Temurin 21 as base image (official OpenJDK successor)
-FROM eclipse-temurin:21-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
 
 # Install curl for health checks and update CA certificates
 RUN apt-get update && apt-get install -y curl ca-certificates && \
