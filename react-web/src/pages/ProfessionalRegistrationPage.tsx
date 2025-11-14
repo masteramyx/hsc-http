@@ -1,4 +1,5 @@
 import { useState, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom'
 import { SEOHead } from '../components/SEOHead';
 import { PhotoUpload } from '../components/PhotoUpload';
 
@@ -70,6 +71,7 @@ const INITIAL_FORM_DATA: FormData = {
 };
 
 export function ProfessionalRegistrationPage() {
+  const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -242,9 +244,11 @@ export function ProfessionalRegistrationPage() {
         if (result.success) {
             // success - show success message and redirect
             console.log('Success!', result)
+            navigate('/welcome/professional')
         } else {
             // failure - show error
             console.log('Failure!', result.message)
+            alert(`Registration failed: ${result.message}`)
         }
     } catch (error) {
         console.log('Network Error: ', error)

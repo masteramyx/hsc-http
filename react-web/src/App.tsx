@@ -10,6 +10,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ForStudentsPage } from './pages/ForStudentsPage';
 import { ForProfessionalsPage } from './pages/ForProfessionalsPage';
 import { ProfessionalRegistrationPage } from './pages/ProfessionalRegistrationPage';
+import {ProfessionalWelcomePage} from "./pages/ProfessionalWelcomePage.tsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/for-students" element={<ForStudentsPage />} />
               <Route path="/for-professionals" element={<ForProfessionalsPage />} />
               <Route path="/register/professional" element={<ProfessionalRegistrationPage />} />
+              <Route path="/welcome/professional" element={<ProfessionalWelcomePage />} />
             </Routes>
           </main>
           <Footer />

@@ -191,6 +191,15 @@ fun Route.professionalRouting() {
                     )
 
                     logger.info("POST /api/v1/professional/register - Registration successful for userId=${result.userId}, professionalId=${result.professionalId}")
+                    logger.info("POST /api/v1/professional/register - Auto-creating session with userId=${result.userId}")
+
+                    val session = UserSession(
+                        userId = result.userId,
+                        email = request.email,
+                        userType = "professional",
+                    )
+                    call.sessions.set(session)
+
                     call.respond(
                         HttpStatusCode.Created,
                         ProfessionalRegistrationResponse(
