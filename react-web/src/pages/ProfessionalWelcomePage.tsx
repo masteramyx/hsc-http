@@ -47,7 +47,7 @@ export function ProfessionalWelcomePage() {
                                 className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50
   transition"
                             >
-                                <h3 className="font-medium text-gray-900">Complete Your Profile</h3>
+                                <h3 className="font-medium text-gray-900">Edit Your Profile</h3>
                                 <p className="text-sm text-gray-600">Add more details to stand out</p>
                             </button>
 
