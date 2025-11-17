@@ -6,6 +6,7 @@ import com.shadowconnect.db.DatabaseFactory
 import com.shadowconnect.db.UserRepositoryImpl
 import com.shadowconnect.shared.model.LoginRequest
 import com.shadowconnect.shared.model.LoginResponse
+import com.shadowconnect.shared.model.LogoutResponse
 import com.shadowconnect.shared.model.UserInfo
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -63,7 +64,7 @@ fun Route.authRouting() {
             call.sessions.clear<UserSession>()
             call.respond(
                 HttpStatusCode.OK,
-                LoginResponse(success = true, message = "Logged out successfully")
+                LogoutResponse(success = true, message = "Logged out successfully")
             )
         }
 
