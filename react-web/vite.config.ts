@@ -30,9 +30,17 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      // /login is both a React Router page AND a backend API endpoint (POST)
+      // bypass: lets browser navigation (GET for HTML) be handled by React Router
+      // while POST requests for authentication are proxied to the backend
       '/login': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        bypass: (req) => {
+          if (req.method === 'GET' && req.headers.accept?.includes('text/html')) {
+            return '/index.html';
+          }
+        },
       },
       '/logout': {
         target: 'http://localhost:8080',
