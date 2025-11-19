@@ -8,6 +8,7 @@ import com.shadowconnect.db.UserRepositoryImpl
 import com.shadowconnect.shared.model.Professional
 import com.shadowconnect.shared.model.ProfessionalRegistrationRequest
 import com.shadowconnect.shared.model.ProfessionalRegistrationResponse
+import com.shadowconnect.shared.model.UserType
 import com.shadowconnect.utils.logger
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -196,7 +197,7 @@ fun Route.professionalRouting() {
                     val session = UserSession(
                         userId = result.userId,
                         email = request.email,
-                        userType = "professional",
+                        userType = UserType.PROFESSIONAL,
                     )
                     call.sessions.set(session)
 

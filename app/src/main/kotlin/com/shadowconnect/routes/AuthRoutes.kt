@@ -8,6 +8,7 @@ import com.shadowconnect.shared.model.LoginRequest
 import com.shadowconnect.shared.model.LoginResponse
 import com.shadowconnect.shared.model.LogoutResponse
 import com.shadowconnect.shared.model.UserInfo
+import com.shadowconnect.shared.model.UserType
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -29,19 +30,20 @@ fun Route.authRouting() {
             
             if (user != null) {
                 // Create session
+                val userType = UserType.fromString(user.user_type)
                 val session = UserSession(
                     userId = user.id,
                     email = user.email,
-                    userType = user.user_type
+                    userType = userType
                 )
                 call.sessions.set(session)
-                
+
                 call.respond(
                     HttpStatusCode.OK,
                     LoginResponse(
                         success = true,
                         message = "Login successful",
-                        user = UserInfo(user.id, user.email, user.user_type)
+                        user = UserInfo(user.id, user.email, userType)
                     )
                 )
             } else {
