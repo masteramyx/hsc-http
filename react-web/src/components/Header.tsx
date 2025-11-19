@@ -53,9 +53,11 @@ export function Header() {
             {/* Show logged-in state */}
             {!isLoading && isLoggedIn && user && (
               <>
-                <span className="text-gray-700 font-medium">
+                <Link
+                     to='/dashboard'
+                    className="text-gray-700 font-medium">
                   {user.email}
-                </span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
