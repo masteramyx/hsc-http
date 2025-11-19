@@ -256,8 +256,6 @@ react-web/src/
 │   ├── PhotoUpload.tsx (new)
 │   ├── SpecialtySelect.tsx (new)
 │   └── ProgressIndicator.tsx (new)
-└── types/
-    └── professional.ts (new)
 ```
 
 **Database:**
