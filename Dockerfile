@@ -28,8 +28,8 @@ COPY react-web/ react-web/
 RUN chmod +x ./gradlew
 
 # Build the backend and React frontend
-# First compile shared module to JavaScript, then build backend and frontend
-RUN ./gradlew :shared:jsProductionLibraryCompileSync :app:shadowJar :react-web:assemble --no-daemon
+# First build shared module, then build backend and frontend
+RUN ./gradlew :shared:build :app:shadowJar :react-web:assemble --no-daemon
 
 # Expose port 8080
 EXPOSE 8080
