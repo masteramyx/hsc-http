@@ -45,6 +45,9 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:2.3.12")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
 
+    // AWS SDK for R2 Storage
+    implementation(libs.aws.s3)
+
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.mock)

@@ -16,7 +16,7 @@ fun Route.userRouting() {
     val studentRepository = StudentRepositoryImpl(database)
 
     //route block sets endpoint and subsequent blocks set http methods
-    route("/students") {
+    route("/api/v1/students") {
         // region get
         /**
          * Return full list of active students
@@ -41,13 +41,8 @@ fun Route.userRouting() {
                     )
                 }
                 
-                if (students.isNotEmpty()) {
-                    logger.debug("GET /students - Returning ${students.size} students")
-                    call.respond(students)
-                } else {
-                    logger.debug("GET /students - No students found")
-                    call.respondText("No students found", status = HttpStatusCode.OK)
-                }
+                logger.debug("GET /api/v1/students - Returning ${students.size} students")
+                call.respond(students)
             } catch (e: Exception) {
                 logger.error("GET /students - Error fetching students: ${e.message}", e)
                 call.respondText("Error fetching students: ${e.message}", status = HttpStatusCode.InternalServerError)

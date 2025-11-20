@@ -36,6 +36,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(libs.kotlin.stdlib)
     implementation(libs.sqldelight.jdbc.driver)
     api(libs.sqldelight.runtime)

@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "@anthropic-ai/claude-code": "^1.0.63"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.3"
+  },
+  "scripts": {
+    "wrangler": "wrangler"
   }
 }

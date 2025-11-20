@@ -16,7 +16,12 @@ fun Application.configureSerialization() {
      *   type of content
      */
     install(ContentNegotiation) {
-        json()
+        json(
+            kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+                prettyPrint = true
+            }
+        )
     }
 
     routing {

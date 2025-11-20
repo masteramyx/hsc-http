@@ -1,19 +1,29 @@
 CREATE TABLE IF NOT EXISTS professional
 (
-    id              SERIAL8 PRIMARY KEY,
-    user_id         BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    first_name      varchar(100) NOT NULL,
-    last_name       varchar(100) NOT NULL,
-    phone           VARCHAR(15) NOT NULL,
-    license_number  varchar(50) UNIQUE,
-    specialization  varchar(100),
-    years_experience INTEGER,
-    organization    varchar(200),
-    title           varchar(100),
-    bio             TEXT,
-    verified        BOOLEAN     DEFAULT FALSE,
-    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+    id                      SERIAL8 PRIMARY KEY,
+    user_id                 BIGINT      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    first_name              varchar(100) NOT NULL,
+    last_name               varchar(100) NOT NULL,
+    phone                   VARCHAR(15) NOT NULL,
+    professional_type       varchar(50) NOT NULL, -- MD, DO, PA, NP, etc.
+    license_number          varchar(50),
+    license_state           varchar(2), -- State where licensed
+    specialization          varchar(100), -- FAMILY_MEDICINE, CARDIOLOGY, etc.
+    years_experience        INTEGER,
+    practice_type           varchar(50), -- HOSPITAL, PRIVATE_PRACTICE, CLINIC, etc.
+    practice_name           varchar(200), -- Name of practice/hospital
+    practice_address        TEXT,
+    practice_city           varchar(100),
+    practice_state          varchar(2),
+    practice_zip            varchar(10),
+    title_position          varchar(100), -- Attending Physician, Chief Resident, etc.
+    bio                     TEXT,
+    photo_url               TEXT,
+    availability            TEXT, -- JSON array of {day, timeRanges} objects
+    availability_notes      TEXT, -- Additional notes about availability
+    verified                BOOLEAN     DEFAULT FALSE,
+    created_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Get professional by ID
@@ -56,22 +66,51 @@ ORDER BY p.years_experience DESC;
 
 -- Create professional
 createProfessional:
-INSERT INTO professional (user_id, first_name, last_name, phone, license_number, specialization, years_experience, organization, title, bio)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  INSERT INTO professional (
+      user_id,
+      first_name,
+      last_name,
+      phone,
+      professional_type,
+      license_number,
+      license_state,
+      specialization,
+      years_experience,
+      practice_type,
+      practice_name,
+      practice_address,
+      practice_city,
+      practice_state,
+      practice_zip,
+      title_position,
+      bio,
+      photo_url,
+      availability,
+      availability_notes
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  RETURNING id;
 
 -- Update professional
 updateProfessional:
-UPDATE professional SET 
-    first_name = ?, 
-    last_name = ?, 
-    phone = ?, 
+UPDATE professional SET
+    first_name = ?,
+    last_name = ?,
+    phone = ?,
     license_number = ?,
+    license_state = ?,
     specialization = ?,
     years_experience = ?,
-    organization = ?,
-    title = ?,
+    practice_type = ?,
+    practice_name = ?,
+    practice_address = ?,
+    practice_city = ?,
+    practice_state = ?,
+    practice_zip = ?,
+    title_position = ?,
     bio = ?,
-    updated_at = CURRENT_TIMESTAMP 
+    availability = ?,
+    availability_notes = ?,
+    updated_at = CURRENT_TIMESTAMP
 WHERE id = ?;
 
 -- Verify professional
@@ -80,3 +119,54 @@ UPDATE professional SET
     verified = TRUE,
     updated_at = CURRENT_TIMESTAMP 
 WHERE id = ?;
+
+  -- Update professional profile
+  updateProfessionalProfile:
+  UPDATE professional
+  SET
+      first_name = ?,
+      last_name = ?,
+      phone = ?,
+      professional_type = ?,
+      license_number = ?,
+      license_state = ?,
+      photo_url = ?,
+      specialization = ?,
+      years_experience = ?,
+      practice_type = ?,
+      practice_name = ?,
+      practice_address = ?,
+      practice_city = ?,
+      practice_state = ?,
+      practice_zip = ?,
+      title_position = ?,
+      bio = ?,
+      availability = ?,
+      availability_notes = ?,
+      updated_at = CURRENT_TIMESTAMP
+  WHERE user_id = ?;
+
+  -- Update only photo
+  updateProfessionalPhoto:
+  UPDATE professional
+  SET photo_url = ?
+  WHERE user_id = ?;
+
+  -- Get all professionals (for browsing/search)
+  getAllProfessionals:
+  SELECT * FROM professional;
+
+  -- Search professionals by location
+  searchProfessionalsByLocation:
+  SELECT * FROM professional
+  WHERE practice_city = ? AND practice_state = ?;
+
+  -- Search professionals by specialization
+  searchProfessionalsBySpecialization:
+  SELECT * FROM professional
+  WHERE specialization = ?;
+
+
+
+CREATE INDEX IF NOT EXISTS idx_professional_location ON professional(practice_city, practice_state);
+CREATE INDEX IF NOT EXISTS idx_professional_location ON professional(specialization);

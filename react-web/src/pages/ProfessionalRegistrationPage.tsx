@@ -1,0 +1,891 @@
+import { useState, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom'
+import { SEOHead } from '../components/SEOHead';
+import { PhotoUpload } from '../components/PhotoUpload';
+
+import {
+  ProfessionalType,
+  MedicalSpecialty,
+  PracticeType,
+  USStates,
+  DayOfWeek,
+  TimeRange,
+  validateFirstName,
+  validateLastName,
+  validateEmail,
+  validatePhone,
+  validatePassword,
+  validateProfessionalType,
+  validateLicenseNumber,
+  validateLicenseState,
+  validateMedicalSpecialty,
+  validateYearsExperience,
+  validatePracticeType,
+  validatePracticeName,
+  validatePracticeAddress,
+  validatePracticeCity,
+  validatePracticeState,
+  validatePracticeZip,
+  validateTitlePosition,
+  validateBio,
+} from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+
+// Availability for a specific day
+type DayAvailability = {
+  day: DayOfWeek;
+  timeRanges: TimeRange[];
+};
+
+type FormData = {
+  // Step 1: Basic Information
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  photo: File | null;
+  password: string;
+  confirmPassword: string;
+
+  // Step 2: Professional Details
+  professionalType: string;
+  licenseNumber: string;
+  licenseState: string;
+  medicalSpecialty: string;
+  yearsExperience: string;
+
+  // Step 3: Practice Information
+  practiceType: string;
+  practiceName: string;
+  practiceAddress: string;
+  practiceCity: string;
+  practiceState: string;
+  practiceZip: string;
+  titlePosition: string;
+
+  // Step 4: Availability
+  availability: DayAvailability[];
+
+  // Step 5: Profile
+  bio: string;
+  availabilityNotes: string;
+};
+
+const INITIAL_FORM_DATA: FormData = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  photo: null,
+  password: '',
+  confirmPassword: '',
+  professionalType: '',
+  licenseNumber: '',
+  licenseState: '',
+  medicalSpecialty: '',
+  yearsExperience: '',
+  practiceType: '',
+  practiceName: '',
+  practiceAddress: '',
+  practiceCity: '',
+  practiceState: '',
+  practiceZip: '',
+  titlePosition: '',
+  availability: [],
+  bio: '',
+  availabilityNotes: '',
+};
+
+export function ProfessionalRegistrationPage() {
+  const navigate = useNavigate()
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string | null>>>({});
+
+  const totalSteps = 5;
+
+  // Get all professional types from Kotlin enum using the standard Kotlin enum API
+  const professionalTypes = ProfessionalType.values();
+
+  // Get all medical specialties from Kotlin enum
+  const medicalSpecialties = MedicalSpecialty.values();
+
+  // Get all practice types from Kotlin enum
+  const practiceTypes = PracticeType.values();
+
+  // Get all US states from Kotlin constants using stable API
+  const usStates = USStates.getInstance().getAll();
+
+  const daysOfWeek = DayOfWeek.values()
+  const timeRanges = TimeRange.values()
+
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  // Toggle a day in the availability array
+  const handleDayToggle = (day: DayOfWeek) => {
+      setFormData((prev) => {
+          // If day already selected - then unselect
+          const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
+          const newAvailability = isCurrentlySelected
+              ? prev.availability.filter(selectedDay => selectedDay.day !== day)
+              : prev.availability.concat({day, timeRanges: []});
+           return {...prev, availability: newAvailability }
+      });
+
+      if(errors.availability) {
+          setErrors((prev) => ({...prev, availability: undefined}))
+      }
+  };
+
+  // This function should toggle a time range within a specific day's timeRanges array
+  const handleTimeRangeToggle = (day: DayOfWeek, timeRange: TimeRange) => {
+    setFormData((prev) => {
+        const newAvailability = prev.availability.map((dayAvail) => {
+            // is this the same day?
+            if (dayAvail.day === day) {
+                // does time exist already?
+                const hasTimeRange = dayAvail.timeRanges.includes(timeRange);
+
+                // if exists already - remove
+                const newTimeRanges = hasTimeRange
+                    ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
+                    : [...dayAvail.timeRanges, timeRange];
+
+                // return updated day object
+                return {...dayAvail, timeRanges: newTimeRanges}
+            }
+
+            // bug - not the right day....do nothing
+            return dayAvail;
+        });
+
+        return {...prev, availability: newAvailability};
+    });
+
+    // Clear errors
+      if(errors.availability) {
+          setErrors((prev) => ({...prev, availability: undefined}))
+      }
+  };
+
+  const validateStep = (step: number): boolean => {
+    const newErrors: Partial<Record<keyof FormData, string | null>> = {};
+
+    if (step === 1) {
+      // Use shared validators
+      newErrors.firstName = validateFirstName(formData.firstName);
+      newErrors.lastName = validateLastName(formData.lastName);
+      newErrors.email = validateEmail(formData.email);
+      newErrors.phone = validatePhone(formData.phone);
+      newErrors.password = validatePassword(formData.password);
+
+      // Password confirmation logic stays in UI (not in shared)
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Please confirm your password';
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+    } else if (step === 2) {
+      newErrors.professionalType = validateProfessionalType(formData.professionalType);
+      newErrors.licenseNumber = validateLicenseNumber(formData.licenseNumber);
+      newErrors.licenseState = validateLicenseState(formData.licenseState);
+      newErrors.medicalSpecialty = validateMedicalSpecialty(formData.medicalSpecialty);
+      newErrors.yearsExperience = validateYearsExperience(formData.yearsExperience);
+    } else if (step === 3) {
+      newErrors.practiceType = validatePracticeType(formData.practiceType);
+      newErrors.practiceName = validatePracticeName(formData.practiceName);
+      newErrors.practiceAddress = validatePracticeAddress(formData.practiceAddress);
+      newErrors.practiceCity = validatePracticeCity(formData.practiceCity);
+      newErrors.practiceState = validatePracticeState(formData.practiceState);
+      newErrors.practiceZip = validatePracticeZip(formData.practiceZip);
+      newErrors.titlePosition = validateTitlePosition(formData.titlePosition);
+    } else if (step === 4) {
+      // Availability validation - custom message for this form
+      if (formData.availability.length === 0) {
+        newErrors.availability = 'Please select at least one day you are available';
+      }
+    } else if (step === 5) {
+      newErrors.bio = validateBio(formData.bio);
+    }
+
+      setErrors(newErrors);  // Set directly, nulls are fine
+      return Object.values(newErrors).every(v => !v);  // Check if all are null/falsy
+  };
+
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+    }
+  };
+
+  const handlePrevious = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep(currentStep)) return;
+
+    console.log('Submitting registration:', formData);
+
+    try {
+        const response = await fetch('/api/v1/professional/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                phone: formData.phone,
+                photo_url: formData.photo ? 'TODO' : null,
+                professional_type: formData.professionalType,
+                license_number: formData.licenseNumber,
+                license_state: formData.licenseState,
+                specialization: formData.medicalSpecialty,
+                years_experience: parseInt(formData.yearsExperience),
+                practice_type: formData.practiceType,
+                practice_name: formData.practiceName,
+                practice_address: formData.practiceAddress,
+                practice_city: formData.practiceCity,
+                practice_state: formData.practiceState,
+                practice_zip: formData.practiceZip,
+                title_position: formData.titlePosition,
+                availability: formData.availability.map( avail => ( {
+                    day: avail.day.name,
+                    time_ranges: avail.timeRanges.map(tr => tr.name)
+                })),
+                bio: formData.bio,
+                availability_notes: formData.availabilityNotes || null,
+            }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // success - show success message and redirect
+            console.log('Success!', result)
+            navigate('/welcome/professional')
+        } else {
+            // failure - show error
+            console.log('Failure!', result.message)
+            alert(`Registration failed: ${result.message}`)
+        }
+    } catch (error) {
+        console.log('Network Error: ', error)
+    }
+  };
+
+  return (
+    <>
+      <SEOHead
+        title="Professional Registration - Shadow Connects"
+        description="Register as a healthcare professional to host shadow students and mentor the next generation."
+        path="/register/professional"
+      />
+      <div className="py-12 bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl mx-auto">
+            {/* Progress Steps */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between">
+                    {[1, 2, 3, 4, 5].map((step, index) => (
+                        <Fragment key={step}>
+                            <div className="flex flex-col items-center">
+                                <div
+                                className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                                                 step < currentStep
+                                             ? 'bg-primary-600 text-white'
+                                             : step === currentStep
+                                             ? 'bg-primary-600 text-white ring-4 ring-primary-200'
+                                             : 'bg-gray-300 text-gray-600'
+                                         }`}
+                                >
+                                    {step < currentStep ? '√' : step}
+                                </div>
+                                <span
+                                    className={`mt-4 text-sm font-medium ${
+                                        currentStep === step ? 'text-primary-600' : 'text-gray-600'
+                                    }`}
+                                >
+              {['Basic Info', 'Professional', 'Practice', 'Availability', 'Profile'][index]}
+            </span>
+                            </div>
+                            {/* Connecting line between steps */}
+                            {index < 4 && (
+                                <div
+                                    className={`flex-1 h-1 mx-4 -mt-6 ${
+                                        step < currentStep ? 'bg-primary-600' : 'bg-gray-300'
+                                    }`}
+                                />
+                            )}
+                        </Fragment>
+                    ))}
+                </div>
+            </div>
+
+            {/* Form Card */}
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              {/* Step 1: Basic Information */}
+              {currentStep === 1 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Basic Information</h2>
+                  <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.firstName ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.firstName && (
+                          <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.lastName ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.lastName && (
+                          <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        placeholder="(555) 123-4567"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Photo (Optional)
+                      </label>
+                      <PhotoUpload
+                        value={formData.photo}
+                        onChange={(file) => setFormData((prev) => ({ ...prev, photo: file }))}
+                        error={errors.photo}
+                      />
+                      <p className="text-gray-500 text-sm mt-2">
+                        Upload a professional headshot to help students recognize you
+                      </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Password *
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.password ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.password && (
+                          <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Confirm Password *
+                        </label>
+                        <input
+                          type="password"
+                          value={formData.confirmPassword}
+                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.confirmPassword && (
+                          <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Professional Details */}
+              {currentStep === 2 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Professional Details</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Professional Type *
+                      </label>
+                      <select
+                        value={formData.professionalType}
+                        onChange={(e) => handleInputChange('professionalType', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.professionalType ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select professional type...</option>
+                        {professionalTypes.map((type: any) => (
+                          <option key={type.name} value={type.name}>
+                            {type.displayName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.professionalType && (
+                        <p className="text-red-500 text-sm mt-1">{errors.professionalType}</p>
+                      )}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          License Number *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.licenseNumber}
+                          onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.licenseNumber ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.licenseNumber && (
+                          <p className="text-red-500 text-sm mt-1">{errors.licenseNumber}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          License State *
+                        </label>
+                        <select
+                          value={formData.licenseState}
+                          onChange={(e) => handleInputChange('licenseState', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.licenseState ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        >
+                          <option value="">Select state...</option>
+                          {usStates.map((state: string) => (
+                            <option key={state} value={state}>
+                              {state}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.licenseState && (
+                          <p className="text-red-500 text-sm mt-1">{errors.licenseState}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Medical Specialty *
+                      </label>
+                      <select
+                        value={formData.medicalSpecialty}
+                        onChange={(e) => handleInputChange('medicalSpecialty', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.medicalSpecialty ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select specialty...</option>
+                        {medicalSpecialties.map((specialty: any) => (
+                          <option key={specialty.name} value={specialty.name}>
+                            {specialty.displayName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.medicalSpecialty && (
+                        <p className="text-red-500 text-sm mt-1">{errors.medicalSpecialty}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Years of Experience *
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="70"
+                        value={formData.yearsExperience}
+                        onChange={(e) => handleInputChange('yearsExperience', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.yearsExperience ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.yearsExperience && (
+                        <p className="text-red-500 text-sm mt-1">{errors.yearsExperience}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Practice Information */}
+              {currentStep === 3 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Practice Information</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Practice Type *
+                      </label>
+                      <select
+                        value={formData.practiceType}
+                        onChange={(e) => handleInputChange('practiceType', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.practiceType ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select practice type...</option>
+                        {practiceTypes.map((type: any) => (
+                          <option key={type.name} value={type.name}>
+                            {type.displayName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.practiceType && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceType}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Practice Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.practiceName}
+                        onChange={(e) => handleInputChange('practiceName', e.target.value)}
+                        placeholder="e.g., Bay Area Medical Center"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.practiceName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.practiceName && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceName}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Street Address *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.practiceAddress}
+                        onChange={(e) => handleInputChange('practiceAddress', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.practiceAddress ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.practiceAddress && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceAddress}</p>
+                      )}
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          City *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.practiceCity}
+                          onChange={(e) => handleInputChange('practiceCity', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceCity ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.practiceCity && (
+                          <p className="text-red-500 text-sm mt-1">{errors.practiceCity}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          State *
+                        </label>
+                        <select
+                          value={formData.practiceState}
+                          onChange={(e) => handleInputChange('practiceState', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceState ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        >
+                          <option value="">Select...</option>
+                          {usStates.map((state: string) => (
+                            <option key={state} value={state}>
+                              {state}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.practiceState && (
+                          <p className="text-red-500 text-sm mt-1">{errors.practiceState}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          ZIP Code *
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.practiceZip}
+                          onChange={(e) => handleInputChange('practiceZip', e.target.value)}
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceZip ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {errors.practiceZip && (
+                          <p className="text-red-500 text-sm mt-1">{errors.practiceZip}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Title/Position *
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.titlePosition}
+                        onChange={(e) => handleInputChange('titlePosition', e.target.value)}
+                        placeholder="e.g., Attending Physician, Chief Resident, etc."
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.titlePosition ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.titlePosition && (
+                        <p className="text-red-500 text-sm mt-1">{errors.titlePosition}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: Availability */}
+              {currentStep === 4 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Availability</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-4">
+                        Select Available Days *
+                      </label>
+                      <p className="text-gray-600 text-sm mb-4">
+                        Choose the days you're typically available to host shadow students
+                      </p>
+                      <div className="space-y-3">
+                        {daysOfWeek.map((day: DayOfWeek) => {
+                          const dayAvailability = formData.availability.find(avail => avail.day === day);
+                          // Explicit type: Converts to boolean (true/false), not "truthy/falsy"
+                          const isDaySelected = !!dayAvailability;
+
+                          return (
+                            <div key={day}>
+                              {/* Day Checkbox */}
+                              <label className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                <input
+                                  type="checkbox"
+                                  checked={isDaySelected}
+                                  onChange={() => handleDayToggle(day)}
+                                  className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                />
+                                <span className="ml-3 text-gray-900 font-medium">{day.displayName}</span>
+                              </label>
+
+                              {/* Time Range Checkboxes - Only show if day is selected */}
+                              {isDaySelected && (
+                                <div className="ml-12 mt-2 space-y-2">
+                                  {timeRanges.map((timeRange: TimeRange) => (
+                                    <label
+                                      key={timeRange.displayName}
+                                      className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={dayAvailability.timeRanges.includes(timeRange)}
+                                        onChange={() => handleTimeRangeToggle(day, timeRange)}
+                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                      />
+                                      <span className="ml-2 text-sm text-gray-700">{timeRange.displayName}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {errors.availability && (
+                        <p className="text-red-500 text-sm mt-2">{errors.availability}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Profile */}
+              {currentStep === 5 && (
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Complete Your Profile</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Professional Bio *
+                      </label>
+                      <textarea
+                        value={formData.bio}
+                        onChange={(e) => handleInputChange('bio', e.target.value)}
+                        rows={6}
+                        placeholder="Tell students about your background, interests, and what they can expect when shadowing you..."
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                          errors.bio ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.bio && (
+                        <p className="text-red-500 text-sm mt-1">{errors.bio}</p>
+                      )}
+                      <p className="text-gray-500 text-sm mt-1">
+                        This will be visible to students viewing your profile.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Availability Notes
+                      </label>
+                      <textarea
+                        value={formData.availabilityNotes}
+                        onChange={(e) => handleInputChange('availabilityNotes', e.target.value)}
+                        rows={4}
+                        placeholder="Optional: Let students know your general availability, preferred times, or any special requirements..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Summary Section */}
+                    <div className="bg-primary-50 rounded-lg p-6 mt-8">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                        Review Your Information
+                      </h3>
+                      <div className="space-y-2 text-sm">
+                        <p>
+                          <span className="font-semibold">Name:</span> {formData.firstName}{' '}
+                          {formData.lastName}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Email:</span> {formData.email}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Professional Type:</span>{' '}
+                          {professionalTypes.find((t: any) => t.name === formData.professionalType)
+                            ?.displayName || formData.professionalType}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Specialty:</span>{' '}
+                          {medicalSpecialties.find(
+                            (s: any) => s.name === formData.medicalSpecialty
+                          )?.displayName || formData.medicalSpecialty}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Practice:</span> {formData.practiceName}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Location:</span> {formData.practiceCity},{' '}
+                          {formData.practiceState}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between mt-8 pt-6 border-t">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentStep === 1}
+                  className={`px-6 py-2 rounded-lg font-semibold ${
+                    currentStep === 1
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  Previous
+                </button>
+
+                {currentStep < totalSteps ? (
+                  <button
+                    onClick={handleNext}
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    className="px-8 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700"
+                  >
+                    Submit Registration
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
