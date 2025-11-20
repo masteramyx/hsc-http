@@ -5,8 +5,10 @@ package com.shadowconnect.shared.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 /**
  * Professional user profile - represents a healthcare professional in the system.
@@ -88,4 +90,12 @@ data class Professional(
 
     @SerialName("is_active")
     val isActive: Boolean
-)
+) {
+    companion object {
+
+        @JsName("fromJson")
+        fun fromJson(jsonString: String): Professional {
+            return Json.decodeFromString(serializer(), jsonString)
+        }
+    }
+}
