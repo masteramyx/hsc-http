@@ -30,7 +30,8 @@ export function DashboardPage() {
                   });
 
                   if (response.ok) {
-                      const data: Professional = await response.json()
+                      const jsonText = await response.text();
+                      const data: Professional = Professional.Companion.fromJson(jsonText);
                       setProfile(data)
                   } else {
                       setProfileError('Failed to load profile');
@@ -79,7 +80,7 @@ export function DashboardPage() {
             </h1>
             <p className="text-gray-600">{user.email}</p>
             <p className="text-sm text-gray-500 mt-1">
-              Account Type: {user.userType}
+              Account Type: {user.userType.name}
             </p>
           </div>
 
@@ -106,10 +107,10 @@ export function DashboardPage() {
                     <span className="font-medium">Name:</span> {profile.firstName} {profile.lastName}
                   </p>
                   <p className="text-gray-700">
-                    <span className="font-medium">Type:</span> {profile.professionalType}
+                    <span className="font-medium">Type:</span> {profile.professionalType.name}
                   </p>
                   <p className="text-gray-700">
-                    <span className="font-medium">Specialization:</span> {profile.specialization}
+                    <span className="font-medium">Specialization:</span> {profile.specialization.name}
                   </p>
                   <p className="text-gray-700">
                     <span className="font-medium">Organization:</span> {profile.organization}
