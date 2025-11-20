@@ -14,6 +14,7 @@ import { ProfessionalRegistrationPage } from './pages/ProfessionalRegistrationPa
 import { ProfessionalWelcomePage } from "./pages/ProfessionalWelcomePage.tsx";
 import { LoginPage } from './pages/LoginPage';
 import {DashboardPage} from "./pages/DashboardPage.tsx";
+import {EditProfilePage} from "./pages/EditProfilePage.tsx";
 
 /**
  * Root application component with three context providers:
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/register/professional" element={<ProfessionalRegistrationPage />} />
                 <Route path="/welcome/professional" element={<ProfessionalWelcomePage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/profile/edit" element={<EditProfilePage />} />
               </Routes>
             </main>
             <Footer />
