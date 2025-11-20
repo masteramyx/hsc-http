@@ -3,7 +3,32 @@ import { useNavigate } from 'react-router-dom'
 import { SEOHead } from '../components/SEOHead';
 import { PhotoUpload } from '../components/PhotoUpload';
 
-import { ProfessionalType, MedicalSpecialty, PracticeType, USStates, DayOfWeek, TimeRange } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import {
+  ProfessionalType,
+  MedicalSpecialty,
+  PracticeType,
+  USStates,
+  DayOfWeek,
+  TimeRange,
+  validateFirstName,
+  validateLastName,
+  validateEmail,
+  validatePhone,
+  validatePassword,
+  validateProfessionalType,
+  validateLicenseNumber,
+  validateLicenseState,
+  validateMedicalSpecialty,
+  validateYearsExperience,
+  validatePracticeType,
+  validatePracticeName,
+  validatePracticeAddress,
+  validatePracticeCity,
+  validatePracticeState,
+  validatePracticeZip,
+  validateTitlePosition,
+  validateBio,
+} from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 
 // Availability for a specific day
 type DayAvailability = {
@@ -74,7 +99,7 @@ export function ProfessionalRegistrationPage() {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string | null>>>({});
 
   const totalSteps = 5;
 
@@ -149,45 +174,47 @@ export function ProfessionalRegistrationPage() {
   };
 
   const validateStep = (step: number): boolean => {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    const newErrors: Partial<Record<keyof FormData, string | null>> = {};
 
     if (step === 1) {
-      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-      if (!formData.email.trim()) newErrors.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-        newErrors.email = 'Invalid email format';
-      if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-      if (!formData.password) newErrors.password = 'Password is required';
-      else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-      if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
-      else if (formData.password !== formData.confirmPassword)
+      // Use shared validators
+      newErrors.firstName = validateFirstName(formData.firstName);
+      newErrors.lastName = validateLastName(formData.lastName);
+      newErrors.email = validateEmail(formData.email);
+      newErrors.phone = validatePhone(formData.phone);
+      newErrors.password = validatePassword(formData.password);
+
+      // Password confirmation logic stays in UI (not in shared)
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Please confirm your password';
+      } else if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
+      }
     } else if (step === 2) {
-      if (!formData.professionalType) newErrors.professionalType = 'Professional type is required';
-      if (!formData.licenseNumber.trim()) newErrors.licenseNumber = 'License number is required';
-      if (!formData.licenseState) newErrors.licenseState = 'License state is required';
-      if (!formData.medicalSpecialty) newErrors.medicalSpecialty = 'Medical specialty is required';
-      if (!formData.yearsExperience) newErrors.yearsExperience = 'Years of experience is required';
+      newErrors.professionalType = validateProfessionalType(formData.professionalType);
+      newErrors.licenseNumber = validateLicenseNumber(formData.licenseNumber);
+      newErrors.licenseState = validateLicenseState(formData.licenseState);
+      newErrors.medicalSpecialty = validateMedicalSpecialty(formData.medicalSpecialty);
+      newErrors.yearsExperience = validateYearsExperience(formData.yearsExperience);
     } else if (step === 3) {
-      if (!formData.practiceType) newErrors.practiceType = 'Practice type is required';
-      if (!formData.practiceName.trim()) newErrors.practiceName = 'Practice name is required';
-      if (!formData.practiceAddress.trim()) newErrors.practiceAddress = 'Address is required';
-      if (!formData.practiceCity.trim()) newErrors.practiceCity = 'City is required';
-      if (!formData.practiceState) newErrors.practiceState = 'State is required';
-      if (!formData.practiceZip.trim()) newErrors.practiceZip = 'ZIP code is required';
-      if (!formData.titlePosition.trim()) newErrors.titlePosition = 'Title/Position is required';
+      newErrors.practiceType = validatePracticeType(formData.practiceType);
+      newErrors.practiceName = validatePracticeName(formData.practiceName);
+      newErrors.practiceAddress = validatePracticeAddress(formData.practiceAddress);
+      newErrors.practiceCity = validatePracticeCity(formData.practiceCity);
+      newErrors.practiceState = validatePracticeState(formData.practiceState);
+      newErrors.practiceZip = validatePracticeZip(formData.practiceZip);
+      newErrors.titlePosition = validateTitlePosition(formData.titlePosition);
     } else if (step === 4) {
-      // Require at least one day to be selected
+      // Availability validation - custom message for this form
       if (formData.availability.length === 0) {
         newErrors.availability = 'Please select at least one day you are available';
       }
     } else if (step === 5) {
-      if (!formData.bio.trim()) newErrors.bio = 'Professional bio is required';
+      newErrors.bio = validateBio(formData.bio);
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+      setErrors(newErrors);  // Set directly, nulls are fine
+      return Object.values(newErrors).every(v => !v);  // Check if all are null/falsy
   };
 
   const handleNext = () => {

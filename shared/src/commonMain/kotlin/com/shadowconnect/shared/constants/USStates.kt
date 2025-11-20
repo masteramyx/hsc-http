@@ -1,6 +1,6 @@
 @file:JsExport
 
-package constants
+package com.shadowconnect.shared.constants
 
 import kotlin.js.JsExport
 
