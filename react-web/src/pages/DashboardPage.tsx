@@ -110,10 +110,10 @@ export function DashboardPage() {
                     <span className="font-medium">Type:</span> {profile.professionalType.name}
                   </p>
                   <p className="text-gray-700">
-                    <span className="font-medium">Specialization:</span> {profile.specialization.name}
+                    <span className="font-medium">Specialization:</span> {profile.specialization?.name || 'Not specified'}
                   </p>
                   <p className="text-gray-700">
-                    <span className="font-medium">Organization:</span> {profile.organization}
+                    <span className="font-medium">Organization:</span> {profile.practiceName || 'Not specified'}
                   </p>
                   <p className="text-gray-700">
                     <span className="font-medium">Verified:</span>{' '}

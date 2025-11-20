@@ -139,12 +139,34 @@ function ProfessionalEditForm() {
                 if (response.ok) {
                     const jsonText = await response.text();
                     const data = Professional.Companion.fromJson(jsonText)
+                    // Can't use spread operator because types don't match:
+                    // Professional has enum objects (professionalType: ProfessionalType), FormData needs strings
+                    // Professional has numbers, FormData needs string representations
+                    // Need explicit conversion for each field
                     const formState: FormData = {
-                        ...data,
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        phone: data.phone,
                         photo: null,
                         password: '',
-                        confirmPassword: ''
-                    }
+                        confirmPassword: '',
+                        professionalType: data.professionalType.name,
+                        licenseNumber: data.licenseNumber || '',
+                        licenseState: data.licenseState || '',
+                        medicalSpecialty: data.specialization?.name || '',
+                        yearsExperience: data.yearsExperience?.toString() || '',
+                        practiceType: data.practiceType?.name || '',
+                        practiceName: data.practiceName || '',
+                        practiceAddress: data.practiceAddress || '',
+                        practiceCity: data.practiceCity || '',
+                        practiceState: data.practiceState || '',
+                        practiceZip: data.practiceZip || '',
+                        titlePosition: data.titlePosition || '',
+                        availability: [],
+                        bio: data.bio || '',
+                        availabilityNotes: data.availabilityNotes || ''
+                    };
                     // Set both original and form data
                     setOriginalData(formState);
                     setFormData(formState);
@@ -335,7 +357,7 @@ function PersonalInfoTab({ formData, errors, handleInputChange, setFormData }: a
                     </label>
                     <PhotoUpload
                         value={formData.photo}
-                        onChange={(file) => setFormData((prev) => ({ ...prev, photo: file }))}
+                        onChange={(file) => setFormData((prev: FormData) => ({ ...prev, photo: file }))}
                         error={errors.photo}
                     />
                     <p className="text-gray-500 text-sm mt-2">

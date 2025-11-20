@@ -414,7 +414,7 @@ export function ProfessionalRegistrationPage() {
                       <PhotoUpload
                         value={formData.photo}
                         onChange={(file) => setFormData((prev) => ({ ...prev, photo: file }))}
-                        error={errors.photo}
+                        error={errors.photo || undefined}
                       />
                       <p className="text-gray-500 text-sm mt-2">
                         Upload a professional headshot to help students recognize you
@@ -733,7 +733,7 @@ export function ProfessionalRegistrationPage() {
                           const isDaySelected = !!dayAvailability;
 
                           return (
-                            <div key={day}>
+                            <div key={day.name}>
                               {/* Day Checkbox */}
                               <label className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                                 <input

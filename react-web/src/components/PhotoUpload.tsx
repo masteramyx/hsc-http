@@ -8,6 +8,13 @@ interface PhotoUploadProps {
 
 export function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
+
+  // Use value prop to initialize preview from existing file
+  if (value && !preview) {
+    const reader = new FileReader();
+    reader.onloadend = () => setPreview(reader.result as string);
+    reader.readAsDataURL(value);
+  }
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
