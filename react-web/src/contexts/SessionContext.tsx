@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { UserInfo, SessionState, LoginRequest, LoginResponse, LogoutResponse } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import { UserInfo, UserType, SessionState, LoginResponse, LogoutResponse } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 
 type SessionContextType = SessionState & {
   login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
@@ -10,14 +10,23 @@ type SessionContextType = SessionState & {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
+function createSessionState({ isLoggedIn, user, isLoading }: {
+    isLoggedIn: boolean,
+    user: UserInfo | null,
+    isLoading: boolean
+}) {
+    return new SessionState(isLoggedIn, user, isLoading)
+}
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const [sessionState, setSessionState] = useState<SessionState>({
+  const [sessionState, setSessionState] = useState<SessionState>(
+      createSessionState({
     isLoggedIn: false,
     user: null,
     isLoading: true,
-  });
-
+    })
+  );
 
   // Check for existing session on mount
   const checkSession = useCallback(async () => {
@@ -30,32 +39,41 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const data: LoginResponse = await response.json();
         if (data.success && data.user) {
-          setSessionState({
+            const userInfo: UserInfo = new UserInfo(
+                data.user.id,
+                data.user.email,
+                UserType.Companion.fromString(data.user.userType)
+            );
+          setSessionState(createSessionState({
             isLoggedIn: true,
-            user: data.user,
+            user: userInfo,
             isLoading: false,
-          });
+          })
+        );
         } else {
-          setSessionState({
+          setSessionState(createSessionState({
             isLoggedIn: false,
             user: null,
             isLoading: false,
-          });
+          })
+        );
         }
       } else {
-        setSessionState({
+        setSessionState(createSessionState({
           isLoggedIn: false,
           user: null,
           isLoading: false,
-        });
+        })
+      );
       }
     } catch (error) {
       console.error('Session check failed:', error);
-      setSessionState({
+      setSessionState(createSessionState({
         isLoggedIn: false,
         user: null,
         isLoading: false,
-      });
+      })
+    );
     }
   }, []);
 
@@ -74,11 +92,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const data: LoginResponse = await response.json();
 
       if (data.success && data.user) {
-        setSessionState({
+        setSessionState(createSessionState({
           isLoggedIn: true,
           user: data.user,
           isLoading: false,
-        });
+        })
+      );
         return { success: true, message: data.message };
       } else {
         return { success: false, message: data.message };
@@ -102,11 +121,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (data.success) {
           console.log('Logout success')
           // Clear session state regardless of API response
-          setSessionState({
+          setSessionState(createSessionState({
               isLoggedIn: false,
               user: null,
               isLoading: false,
-          });
+          })
+      );
           return { success: true, message: data.message }
       } else {
          console.error('Logout error:', data.message)
@@ -125,6 +145,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   return (
     <SessionContext.Provider
+      // @ts-expect-error - SessionState class methods not needed in context
       value={{
         ...sessionState,
         login,
