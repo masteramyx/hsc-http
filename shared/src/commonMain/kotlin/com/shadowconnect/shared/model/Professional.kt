@@ -40,17 +40,23 @@ data class Professional(
     @SerialName("license_number")
     val licenseNumber: String? = null,
 
+    @SerialName("license_state")
+    val licenseState: String? = null,
+
     @SerialName("specialization")
     val specialization: MedicalSpecialty? = null,
 
     @SerialName("years_experience")
     val yearsExperience: Int? = null,
 
-    @SerialName("organization")
-    val organization: String? = null,
-
     @SerialName("practice_type")
     val practiceType: PracticeType? = null,
+
+    @SerialName("practice_name")
+    val practiceName: String? = null,
+
+    @SerialName("practice_address")
+    val practiceAddress: String? = null,
 
     @SerialName("practice_city")
     val practiceCity: String? = null,
@@ -58,29 +64,23 @@ data class Professional(
     @SerialName("practice_state")
     val practiceState: String? = null,
 
-    @SerialName("practice_address")
-    val practiceAddress: String? = null,
+    @SerialName("practice_zip")
+    val practiceZip: String? = null,
 
-    @SerialName("specialties")
-    val specialties: String? = null, // JSON array of additional specialties
-
-    @SerialName("student_requirements")
-    val studentRequirements: String? = null,
-
-    @SerialName("available_days")
-    val availableDays: String? = null, // JSON array
-
-    @SerialName("available_times")
-    val availableTimes: String? = null,
-
-    @SerialName("title")
-    val title: String? = null,
+    @SerialName("title_position")
+    val titlePosition: String? = null,
 
     @SerialName("bio")
     val bio: String? = null,
 
     @SerialName("photo_url")
     val photoUrl: String? = null,
+
+    @SerialName("availability")
+    val availability: String? = null, // JSON array of DayAvailability
+
+    @SerialName("availability_notes")
+    val availabilityNotes: String? = null,
 
     @SerialName("verified")
     val verified: Boolean = false,
