@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../contexts/SessionContext.tsx';
-import { UserInfo, UserType, Professional } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import { UserInfo, UserType, Professional, ProfessionalType, MedicalSpecialty, PracticeType, USStates, DayOfWeek, TimeRange, DayAvailability } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 import { SEOHead} from '../components/SEOHead.tsx';
 import {PhotoUpload} from "../components/PhotoUpload.tsx";
-import { FormData } from '../types/FormData.ts';
+import type { FormData } from '../types/FormData.ts';
 
 const INITIAL_FORM_DATA: FormData = {
     firstName: '',
@@ -132,6 +132,17 @@ function ProfessionalEditForm() {
                         photoFile = await fetchPhotoAsFile(data.photoUrl);
                     }
 
+                    // Parse availability JSON string using Kotlin serializer
+                    // The Kotlin function converts everything to JS arrays at the boundary
+                    let availabilityArray: any[] = [];
+                    if (data.availability) {
+                        try {
+                            availabilityArray = DayAvailability.Companion.fromJsonArray(data.availability);
+                        } catch (e) {
+                            console.error('Failed to parse availability:', e);
+                        }
+                    }
+
                     // Can't use spread operator because types don't match:
                     // Professional has enum objects (professionalType: ProfessionalType), FormData needs strings
                     // Professional has numbers, FormData needs string representations
@@ -156,7 +167,7 @@ function ProfessionalEditForm() {
                         practiceState: data.practiceState || '',
                         practiceZip: data.practiceZip || '',
                         titlePosition: data.titlePosition || '',
-                        availability: [],
+                        availability: availabilityArray,
                         bio: data.bio || '',
                         availabilityNotes: data.availabilityNotes || ''
                     };
@@ -182,6 +193,42 @@ function ProfessionalEditForm() {
         // Clear error for this field when user types
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: undefined }));
+        }
+    };
+
+    // Toggle a day in the availability array
+    const handleDayToggle = (day: DayOfWeek) => {
+        setFormData((prev) => {
+            const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
+            const newAvailability = isCurrentlySelected
+                ? prev.availability.filter(selectedDay => selectedDay.day !== day)
+                : prev.availability.concat({day, timeRanges: []});
+            return {...prev, availability: newAvailability }
+        });
+
+        if(errors.availability) {
+            setErrors((prev) => ({...prev, availability: undefined}))
+        }
+    };
+
+    // Toggle a time range within a specific day's timeRanges array
+    const handleTimeRangeToggle = (day: DayOfWeek, timeRange: TimeRange) => {
+        setFormData((prev) => {
+            const newAvailability = prev.availability.map((dayAvail) => {
+                if (dayAvail.day === day) {
+                    const hasTimeRange = dayAvail.timeRanges.includes(timeRange);
+                    const newTimeRanges = hasTimeRange
+                        ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
+                        : [...dayAvail.timeRanges, timeRange];
+                    return {...dayAvail, timeRanges: newTimeRanges}
+                }
+                return dayAvail;
+            });
+            return {...prev, availability: newAvailability};
+        });
+
+        if(errors.availability) {
+            setErrors((prev) => ({...prev, availability: undefined}))
         }
     };
 
@@ -228,16 +275,12 @@ function ProfessionalEditForm() {
 
             {/*Tab Content - render conditionally*/}
             <div className="p-4">
-                {/*{activeTab === 0 && <PersonalInfoTab />}*/}
-                {/*{activeTab === 1 && <CredentialsTab />}*/}
-                {/*{activeTab === 2 && <PracticeInfoTab />}*/}
-                {/*{activeTab === 3 && <ShadowingDetailsTab />}*/}
                 {(() => {
                     switch(activeTab) {
                         case 0: return <PersonalInfoTab formData={formData} errors={errors} handleInputChange={handleInputChange} setFormData={setFormData} />;
-                        case 1: return <CredentialsTab />;
-                        case 2: return <PracticeInfoTab />;
-                        case 3: return <ShadowingDetailsTab />;
+                        case 1: return <CredentialsTab formData={formData} errors={errors} handleInputChange={handleInputChange} />;
+                        case 2: return <PracticeInfoTab formData={formData} errors={errors} handleInputChange={handleInputChange} />;
+                        case 3: return <ShadowingDetailsTab formData={formData} errors={errors} handleInputChange={handleInputChange} handleDayToggle={handleDayToggle} handleTimeRangeToggle={handleTimeRangeToggle} />;
                     }
                 })()}
             </div>
@@ -269,7 +312,6 @@ function ProfessionalEditForm() {
 
 
 function PersonalInfoTab({ formData, errors, handleInputChange, setFormData }: any) {
-    // return <div>Personal Info Tab</div>;
     return (
         <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Basic Information</h2>
@@ -396,14 +438,364 @@ function PersonalInfoTab({ formData, errors, handleInputChange, setFormData }: a
         </div>
     )
 }
-function CredentialsTab(){
-    return <div>Personal Info Tab</div>;
+function CredentialsTab({ formData, errors, handleInputChange }: any){
+    const professionalTypes = ProfessionalType.values();
+    const medicalSpecialties = MedicalSpecialty.values();
+    const usStates = USStates.getInstance().getAll();
+
+    return (
+        <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Professional Credentials</h2>
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Professional Type *
+                    </label>
+                    <select
+                        value={formData.professionalType}
+                        onChange={(e) => handleInputChange('professionalType', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.professionalType ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    >
+                        <option value="">Select professional type...</option>
+                        {professionalTypes.map((type: any) => (
+                            <option key={type.name} value={type.name}>
+                                {type.displayName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.professionalType && (
+                        <p className="text-red-500 text-sm mt-1">{errors.professionalType}</p>
+                    )}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            License Number *
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.licenseNumber}
+                            onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                                errors.licenseNumber ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        />
+                        {errors.licenseNumber && (
+                            <p className="text-red-500 text-sm mt-1">{errors.licenseNumber}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            License State *
+                        </label>
+                        <select
+                            value={formData.licenseState}
+                            onChange={(e) => handleInputChange('licenseState', e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                                errors.licenseState ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        >
+                            <option value="">Select state...</option>
+                            {usStates.map((state: string) => (
+                                <option key={state} value={state}>
+                                    {state}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.licenseState && (
+                            <p className="text-red-500 text-sm mt-1">{errors.licenseState}</p>
+                        )}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Medical Specialty *
+                    </label>
+                    <select
+                        value={formData.medicalSpecialty}
+                        onChange={(e) => handleInputChange('medicalSpecialty', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.medicalSpecialty ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    >
+                        <option value="">Select specialty...</option>
+                        {medicalSpecialties.map((specialty: any) => (
+                            <option key={specialty.name} value={specialty.name}>
+                                {specialty.displayName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.medicalSpecialty && (
+                        <p className="text-red-500 text-sm mt-1">{errors.medicalSpecialty}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Years of Experience *
+                    </label>
+                    <input
+                        type="number"
+                        min="0"
+                        max="70"
+                        value={formData.yearsExperience}
+                        onChange={(e) => handleInputChange('yearsExperience', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.yearsExperience ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.yearsExperience && (
+                        <p className="text-red-500 text-sm mt-1">{errors.yearsExperience}</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
 }
-function PracticeInfoTab(){
-    return <div>Personal Info Tab</div>;
+function PracticeInfoTab({ formData, errors, handleInputChange }: any){
+    const practiceTypes = PracticeType.values();
+    const usStates = USStates.getInstance().getAll();
+
+    return (
+        <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Practice Information</h2>
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Practice Type *
+                    </label>
+                    <select
+                        value={formData.practiceType}
+                        onChange={(e) => handleInputChange('practiceType', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceType ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    >
+                        <option value="">Select practice type...</option>
+                        {practiceTypes.map((type: any) => (
+                            <option key={type.name} value={type.name}>
+                                {type.displayName}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.practiceType && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceType}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Practice Name *
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.practiceName}
+                        onChange={(e) => handleInputChange('practiceName', e.target.value)}
+                        placeholder="e.g., Bay Area Medical Center"
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceName ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.practiceName && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceName}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Street Address *
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.practiceAddress}
+                        onChange={(e) => handleInputChange('practiceAddress', e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.practiceAddress ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.practiceAddress && (
+                        <p className="text-red-500 text-sm mt-1">{errors.practiceAddress}</p>
+                    )}
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            City *
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.practiceCity}
+                            onChange={(e) => handleInputChange('practiceCity', e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                                errors.practiceCity ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        />
+                        {errors.practiceCity && (
+                            <p className="text-red-500 text-sm mt-1">{errors.practiceCity}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            State *
+                        </label>
+                        <select
+                            value={formData.practiceState}
+                            onChange={(e) => handleInputChange('practiceState', e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                                errors.practiceState ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        >
+                            <option value="">Select...</option>
+                            {usStates.map((state: string) => (
+                                <option key={state} value={state}>
+                                    {state}
+                                </option>
+                            ))}
+                        </select>
+                        {errors.practiceState && (
+                            <p className="text-red-500 text-sm mt-1">{errors.practiceState}</p>
+                        )}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            ZIP Code *
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.practiceZip}
+                            onChange={(e) => handleInputChange('practiceZip', e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                                errors.practiceZip ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        />
+                        {errors.practiceZip && (
+                            <p className="text-red-500 text-sm mt-1">{errors.practiceZip}</p>
+                        )}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Title/Position *
+                    </label>
+                    <input
+                        type="text"
+                        value={formData.titlePosition}
+                        onChange={(e) => handleInputChange('titlePosition', e.target.value)}
+                        placeholder="e.g., Attending Physician, Chief Resident, etc."
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.titlePosition ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.titlePosition && (
+                        <p className="text-red-500 text-sm mt-1">{errors.titlePosition}</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
 }
-function ShadowingDetailsTab(){
-    return <div>Personal Info Tab</div>;
+
+function ShadowingDetailsTab({ formData, errors, handleInputChange, handleDayToggle, handleTimeRangeToggle }: any){
+    const daysOfWeek = DayOfWeek.values();
+    const timeRanges = TimeRange.values();
+
+    return (
+        <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Shadowing Availability & Profile</h2>
+            <div className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-4">
+                        Select Available Days *
+                    </label>
+                    <p className="text-gray-600 text-sm mb-4">
+                        Choose the days you're typically available to host shadow students
+                    </p>
+                    <div className="space-y-3">
+                        {daysOfWeek.map((day: DayOfWeek) => {
+                            const dayAvailability = formData.availability.find((avail: any) => avail.day === day);
+                            const isDaySelected = !!dayAvailability;
+
+                            return (
+                                <div key={day.name}>
+                                    <label className="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            checked={isDaySelected}
+                                            onChange={() => handleDayToggle(day)}
+                                            className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                        />
+                                        <span className="ml-3 text-gray-900 font-medium">{day.displayName}</span>
+                                    </label>
+
+                                    {isDaySelected && (
+                                        <div className="ml-12 mt-2 space-y-2">
+                                            {timeRanges.map((timeRange: TimeRange) => (
+                                                <label
+                                                    key={timeRange.displayName}
+                                                    className="flex items-center p-2 hover:bg-gray-50 cursor-pointer rounded"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={dayAvailability.timeRanges.includes(timeRange)}
+                                                        onChange={() => handleTimeRangeToggle(day, timeRange)}
+                                                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                                                    />
+                                                    <span className="ml-2 text-sm text-gray-700">{timeRange.displayName}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {errors.availability && (
+                        <p className="text-red-500 text-sm mt-2">{errors.availability}</p>
+                    )}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Professional Bio *
+                    </label>
+                    <textarea
+                        value={formData.bio}
+                        onChange={(e) => handleInputChange('bio', e.target.value)}
+                        rows={6}
+                        placeholder="Tell students about your background, interests, and what they can expect when shadowing you..."
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent ${
+                            errors.bio ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    />
+                    {errors.bio && (
+                        <p className="text-red-500 text-sm mt-1">{errors.bio}</p>
+                    )}
+                    <p className="text-gray-500 text-sm mt-1">
+                        This will be visible to students viewing your profile.
+                    </p>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Availability Notes
+                    </label>
+                    <textarea
+                        value={formData.availabilityNotes}
+                        onChange={(e) => handleInputChange('availabilityNotes', e.target.value)}
+                        rows={4}
+                        placeholder="Optional: Let students know your general availability, preferred times, or any special requirements..."
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                    />
+                </div>
+            </div>
+        </div>
+    )
 }
 
 

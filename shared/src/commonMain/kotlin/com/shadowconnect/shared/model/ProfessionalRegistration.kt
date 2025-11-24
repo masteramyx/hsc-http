@@ -5,8 +5,11 @@ package com.shadowconnect.shared.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
+import kotlin.js.JsName
 
 /**
  * Complete professional registration request combining user account creation
@@ -97,6 +100,34 @@ data class DayAvailability(
 
     @SerialName("time_ranges")
     val timeRanges: List<TimeRange>
+) {
+    companion object {
+        /**
+         * Deserialize a JSON string containing an array of DayAvailability objects
+         * Example: "[{\"day\":\"MONDAY\",\"time_ranges\":[\"MORNING\",\"AFTERNOON\"]}]"
+         * Returns a JavaScript array (not KtList) for direct use in JS/React
+         * Also converts nested timeRanges lists to JS arrays
+         */
+        @JsName("fromJsonArray")
+        fun fromJsonArray(jsonString: String): Array<DayAvailabilityJS> {
+            val list = Json.decodeFromString(ListSerializer(serializer()), jsonString)
+            // Convert to JS-friendly format with arrays instead of Lists
+            return list.map { dayAvail ->
+                DayAvailabilityJS(
+                    day = dayAvail.day,
+                    timeRanges = dayAvail.timeRanges.toTypedArray()
+                )
+            }.toTypedArray()
+        }
+    }
+}
+
+/**
+ * JavaScript-friendly version of DayAvailability with Array instead of List for timeRanges
+ */
+data class DayAvailabilityJS(
+    val day: DayOfWeek,
+    val timeRanges: Array<TimeRange>
 )
 
 /**
