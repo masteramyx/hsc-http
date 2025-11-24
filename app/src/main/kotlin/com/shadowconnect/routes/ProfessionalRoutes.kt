@@ -5,9 +5,11 @@ import com.shadowconnect.auth.UserSession
 import com.shadowconnect.db.DatabaseFactory
 import com.shadowconnect.db.ProfessionalRepositoryImpl
 import com.shadowconnect.db.UserRepositoryImpl
+import com.shadowconnect.shared.model.DayAvailability
 import com.shadowconnect.shared.model.Professional
 import com.shadowconnect.shared.model.ProfessionalRegistrationRequest
 import com.shadowconnect.shared.model.ProfessionalRegistrationResponse
+import com.shadowconnect.shared.model.UpdateProfessionalRequest
 import com.shadowconnect.shared.model.UserType
 import com.shadowconnect.utils.logger
 import io.ktor.http.*
@@ -288,60 +290,64 @@ fun Route.professionalRouting() {
                 }
 
                 // Update current user's professional profile
-//                put("/profile") {
-//                    val session = call.sessions.get<UserSession>()
-//                    if (session == null) {
-//                        logger.warn("PUT /api/v1/professional/profile - No valid session")
-//                        return@put call.respond(
-//                            HttpStatusCode.Unauthorized,
-//                            mapOf("error" to "Not authenticated")
-//                        )
-//                    }
-//
-//                    logger.debug("PUT /api/v1/professional/profile - Updating profile for user ${session.userId}")
-//                    try {
-//                        val request: UpdateProfessionalRequest = call.receive()
-//
-//                        val success = professionalRepository.updateProfessionalProfile(
-//                            userId = session.userId,
-//                            firstName = request.firstName,
-//                            lastName = request.lastName,
-//                            phone = request.phone,
-//                            professionalType = request.professionalType,
-//                            photoUrl = request.photoUrl,
-//                            specialization = request.specialization,
-//                            practiceType = request.practiceType,
-//                            practiceCity = request.practiceCity,
-//                            practiceState = request.practiceState,
-//                            practiceAddress = request.practiceAddress,
-//                            bio = request.bio,
-//                            specialties = request.specialties,
-//                            studentRequirements = request.studentRequirements,
-//                            availableDays = request.availableDays,
-//                            availableTimes = request.availableTimes
-//                        )
-//
-//                        if (success) {
-//                            logger.info("PUT /api/v1/professional/profile - Profile updated successfully")
-//                            call.respond(
-//                                HttpStatusCode.OK,
-//                                mapOf("message" to "Professional profile updated successfully")
-//                            )
-//                        } else {
-//                            logger.warn("PUT /api/v1/professional/profile - Failed to update profile")
-//                            call.respondText(
-//                                "Failed to update professional profile",
-//                                status = HttpStatusCode.InternalServerError
-//                            )
-//                        }
-//                    } catch (e: Exception) {
-//                        logger.error("PUT /api/v1/professional/profile - Error updating profile: ${e.message}", e)
-//                        call.respondText(
-//                            "Error updating profile: ${e.message}",
-//                            status = HttpStatusCode.BadRequest
-//                        )
-//                    }
-//                }
+                put("/profile") {
+                    val session = call.sessions.get<UserSession>()
+                    if (session == null) {
+                        logger.warn("PUT /api/v1/professional/profile - No valid session")
+                        return@put call.respond(
+                            HttpStatusCode.Unauthorized,
+                            mapOf("error" to "Not authenticated")
+                        )
+                    }
+
+                    logger.debug("PUT /api/v1/professional/profile - Updating profile for user ${session.userId}")
+                    try {
+                        val request: UpdateProfessionalRequest = call.receive()
+
+                        val success = professionalRepository.updateProfessionalProfile(
+                            userId = session.userId,
+                            firstName = request.firstName,
+                            lastName = request.lastName,
+                            phone = request.phone,
+                            professionalType = request.professionalType,
+                            licenseNumber = request.licenseNumber,
+                            licenseState = request.licenseState,
+                            specialization = request.specialization,
+                            yearsExperience = request.yearsExperience,
+                            practiceType = request.practiceType,
+                            practiceName = request.practiceName,
+                            practiceAddress = request.practiceAddress,
+                            practiceCity = request.practiceCity,
+                            practiceState = request.practiceState,
+                            practiceZip = request.practiceZip,
+                            titlePosition = request.titlePosition,
+                            bio = request.bio,
+                            photoUrl = request.photoUrl,
+                            availabilityJson = Json.encodeToString(request.availability),
+                            availabilityNotes = request.availabilityNotes,
+                        )
+
+                        if (success) {
+                            logger.info("PUT /api/v1/professional/profile - Profile updated successfully")
+                            call.respond(
+                                HttpStatusCode.OK,
+                                mapOf("message" to "Professional profile updated successfully")
+                            )
+                        } else {
+                            logger.warn("PUT /api/v1/professional/profile - Failed to update profile")
+                            call.respondText(
+                                "Failed to update professional profile",
+                                status = HttpStatusCode.InternalServerError
+                            )
+                        }
+                    } catch (e: Exception) {
+                        logger.error("PUT /api/v1/professional/profile - Error updating profile: ${e.message}", e)
+                        call.respondText(
+                            "Error updating profile: ${e.message}",
+                            status = HttpStatusCode.BadRequest
+                        )
+                    }
+                }
             }
         }
     }
