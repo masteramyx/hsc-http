@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { SEOHead } from '../components/SEOHead';
 import { PhotoUpload } from '../components/PhotoUpload';
 import type { FormData } from '../types/FormData.ts';
+import { uploadPhoto } from "../utils/photoUpload.ts";
 
 
 import {
@@ -12,7 +13,6 @@ import {
   USStates,
   DayOfWeek,
   TimeRange,
-  PhotoUploadResponse,
   validateFirstName,
   validateLastName,
   validateEmail,
@@ -143,35 +143,6 @@ export function ProfessionalRegistrationPage() {
 
   const handlePrevious = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
-  };
-
-  /**
-   * Uploads a photo to R2 storage and returns the public URL
-   * @param file - The File object to upload
-   * @returns The public URL of the uploaded photo, or null if upload fails
-   */
-  const uploadPhoto = async (file: File): Promise<string | null> => {
-    try {
-      const form = new FormData();
-      form.append('file', file);
-
-      const response = await fetch('/api/upload/photo', {
-        method: 'POST',
-        body: form
-      });
-
-      const result: PhotoUploadResponse = await response.json();
-
-      if (result.success && result.photoUrl) {
-        return result.photoUrl;
-      } else {
-        console.error('Upload failed:', result.error);
-        return null;
-      }
-    } catch (error) {
-      console.error('Photo upload failed:', error);
-      return null;
-    }
   };
 
   const handleSubmit = async () => {

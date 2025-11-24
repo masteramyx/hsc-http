@@ -7,6 +7,7 @@ import {PhotoUpload} from "../components/PhotoUpload.tsx";
 import type { FormData } from '../types/FormData.ts';
 import {useAvailabilityHandlers} from "../hooks/useAvailabilityHandlers.ts";
 import { UpdateProfessionalRequest } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import { uploadPhoto } from '../utils/photoUpload.ts';
 
 const INITIAL_FORM_DATA: FormData = {
     firstName: '',
@@ -97,6 +98,7 @@ function ProfessionalEditForm() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const { handleDayToggle, handleTimeRangeToggle } = useAvailabilityHandlers(setFormData, errors, setErrors)
+    const [originalPhotoUrl, setOriginalPhotoUrl] = useState<string | null>(null);
 
     /**
      * Fetches a photo from URL and converts it to a File object
@@ -133,6 +135,7 @@ function ProfessionalEditForm() {
                     let photoFile: File | null = null;
                     if (data.photoUrl) {
                         photoFile = await fetchPhotoAsFile(data.photoUrl);
+                        setOriginalPhotoUrl(data.photoUrl);
                     }
 
                     // Parse availability JSON string using Kotlin serializer
@@ -202,6 +205,12 @@ function ProfessionalEditForm() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
+            let photoUrl = originalPhotoUrl;
+
+            // If user uploaded new photo, upload it first
+            if (formData.photo && formData.photo !== originalData?.photo) {
+                photoUrl = await uploadPhoto(formData.photo);
+            }
             // Use factory method - handles all string→enum and array→list conversions in Kotlin
             const request: UpdateProfessionalRequest = UpdateProfessionalRequest.Companion.fromJsData(
                 formData.firstName,
@@ -220,7 +229,7 @@ function ProfessionalEditForm() {
                 formData.practiceZip || null,
                 formData.titlePosition || null,
                 formData.bio || null,
-                null, // photoUrl - handled separately
+                photoUrl,  // Uploaded new or preserved existing
                 formData.availability,  // DayAvailabilityJS[], factory converts to List<DayAvailability>
                 formData.availabilityNotes || null
             );
