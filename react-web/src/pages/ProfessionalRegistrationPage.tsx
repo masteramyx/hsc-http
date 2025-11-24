@@ -32,6 +32,7 @@ import {
   validateTitlePosition,
   validateBio,
 } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import {useAvailabilityHandlers} from "../hooks/useAvailabilityHandlers.ts";
 
 const INITIAL_FORM_DATA: FormData = {
   firstName: '',
@@ -63,6 +64,7 @@ export function ProfessionalRegistrationPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string | null>>>({});
+  const { handleDayToggle, handleTimeRangeToggle } = useAvailabilityHandlers(setFormData, errors, setErrors)
 
   const totalSteps = 5;
 
@@ -87,53 +89,6 @@ export function ProfessionalRegistrationPage() {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
-  };
-
-  // Toggle a day in the availability array
-  const handleDayToggle = (day: DayOfWeek) => {
-      setFormData((prev) => {
-          // If day already selected - then unselect
-          const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
-          const newAvailability = isCurrentlySelected
-              ? prev.availability.filter(selectedDay => selectedDay.day !== day)
-              : prev.availability.concat({day, timeRanges: []});
-           return {...prev, availability: newAvailability }
-      });
-
-      if(errors.availability) {
-          setErrors((prev) => ({...prev, availability: undefined}))
-      }
-  };
-
-  // This function should toggle a time range within a specific day's timeRanges array
-  const handleTimeRangeToggle = (day: DayOfWeek, timeRange: TimeRange) => {
-    setFormData((prev) => {
-        const newAvailability = prev.availability.map((dayAvail) => {
-            // is this the same day?
-            if (dayAvail.day === day) {
-                // does time exist already?
-                const hasTimeRange = dayAvail.timeRanges.includes(timeRange);
-
-                // if exists already - remove
-                const newTimeRanges = hasTimeRange
-                    ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
-                    : [...dayAvail.timeRanges, timeRange];
-
-                // return updated day object
-                return {...dayAvail, timeRanges: newTimeRanges}
-            }
-
-            // bug - not the right day....do nothing
-            return dayAvail;
-        });
-
-        return {...prev, availability: newAvailability};
-    });
-
-    // Clear errors
-      if(errors.availability) {
-          setErrors((prev) => ({...prev, availability: undefined}))
-      }
   };
 
   const validateStep = (step: number): boolean => {

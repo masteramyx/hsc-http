@@ -5,6 +5,7 @@ import { UserInfo, UserType, Professional, ProfessionalType, MedicalSpecialty, P
 import { SEOHead} from '../components/SEOHead.tsx';
 import {PhotoUpload} from "../components/PhotoUpload.tsx";
 import type { FormData } from '../types/FormData.ts';
+import {useAvailabilityHandlers} from "../hooks/useAvailabilityHandlers.ts";
 
 const INITIAL_FORM_DATA: FormData = {
     firstName: '',
@@ -91,9 +92,10 @@ function ProfessionalEditForm() {
     // State management for dirty tracking
     const [originalData, setOriginalData] = useState<FormData | null>(null);
     const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
-    const [errors, setErrors] = useState<Record<string, string | undefined>>({});
+    const [errors, setErrors] = useState<Partial<Record<keyof FormData, string | null>>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const { handleDayToggle, handleTimeRangeToggle } = useAvailabilityHandlers(setFormData, errors, setErrors)
 
     /**
      * Fetches a photo from URL and converts it to a File object
@@ -188,47 +190,11 @@ function ProfessionalEditForm() {
     // Compare formData with originalData to determine if Save should be enabled
     const hasChanges = (originalData !== null && JSON.stringify(formData) !== JSON.stringify(originalData));
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: keyof FormData, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         // Clear error for this field when user types
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: undefined }));
-        }
-    };
-
-    // Toggle a day in the availability array
-    const handleDayToggle = (day: DayOfWeek) => {
-        setFormData((prev) => {
-            const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
-            const newAvailability = isCurrentlySelected
-                ? prev.availability.filter(selectedDay => selectedDay.day !== day)
-                : prev.availability.concat({day, timeRanges: []});
-            return {...prev, availability: newAvailability }
-        });
-
-        if(errors.availability) {
-            setErrors((prev) => ({...prev, availability: undefined}))
-        }
-    };
-
-    // Toggle a time range within a specific day's timeRanges array
-    const handleTimeRangeToggle = (day: DayOfWeek, timeRange: TimeRange) => {
-        setFormData((prev) => {
-            const newAvailability = prev.availability.map((dayAvail) => {
-                if (dayAvail.day === day) {
-                    const hasTimeRange = dayAvail.timeRanges.includes(timeRange);
-                    const newTimeRanges = hasTimeRange
-                        ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
-                        : [...dayAvail.timeRanges, timeRange];
-                    return {...dayAvail, timeRanges: newTimeRanges}
-                }
-                return dayAvail;
-            });
-            return {...prev, availability: newAvailability};
-        });
-
-        if(errors.availability) {
-            setErrors((prev) => ({...prev, availability: undefined}))
         }
     };
 
