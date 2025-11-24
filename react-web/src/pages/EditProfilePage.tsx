@@ -95,6 +95,25 @@ function ProfessionalEditForm() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
+    /**
+     * Fetches a photo from URL and converts it to a File object
+     */
+    const fetchPhotoAsFile = async (photoUrl: string): Promise<File | null> => {
+        try {
+            const response = await fetch(photoUrl)
+            if(response.ok) {
+                const blob = await response.blob();
+                const filename = photoUrl.split('/').pop() || 'profile-photo.jpg';
+                return new File([blob], filename, { type: blob.type });
+            } else {
+                return null;
+                }
+        } catch (error) {
+            console.error('Failed to fetch photo:', error);
+            return null;
+        }
+    };
+
     // Fetch profile data on mount
     useEffect(() => {
         const fetchProfile = async () => {
@@ -106,6 +125,13 @@ function ProfessionalEditForm() {
                 if (response.ok) {
                     const jsonText = await response.text();
                     const data = Professional.Companion.fromJson(jsonText)
+
+                    // Fetch existing photo if URL exists
+                    let photoFile: File | null = null;
+                    if (data.photoUrl) {
+                        photoFile = await fetchPhotoAsFile(data.photoUrl);
+                    }
+
                     // Can't use spread operator because types don't match:
                     // Professional has enum objects (professionalType: ProfessionalType), FormData needs strings
                     // Professional has numbers, FormData needs string representations
@@ -115,7 +141,7 @@ function ProfessionalEditForm() {
                         lastName: data.lastName,
                         email: data.email,
                         phone: data.phone,
-                        photo: null,
+                        photo: photoFile,
                         password: '',
                         confirmPassword: '',
                         professionalType: data.professionalType.name,

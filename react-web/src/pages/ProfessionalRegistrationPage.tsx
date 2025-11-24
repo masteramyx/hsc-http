@@ -2,7 +2,8 @@ import { useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom'
 import { SEOHead } from '../components/SEOHead';
 import { PhotoUpload } from '../components/PhotoUpload';
-import { FormData } from '../types/FormData.ts';
+import type { FormData } from '../types/FormData.ts';
+
 
 import {
   ProfessionalType,
@@ -11,6 +12,7 @@ import {
   USStates,
   DayOfWeek,
   TimeRange,
+  PhotoUploadResponse,
   validateFirstName,
   validateLastName,
   validateEmail,
@@ -188,12 +190,51 @@ export function ProfessionalRegistrationPage() {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  /**
+   * Uploads a photo to R2 storage and returns the public URL
+   * @param file - The File object to upload
+   * @returns The public URL of the uploaded photo, or null if upload fails
+   */
+  const uploadPhoto = async (file: File): Promise<string | null> => {
+    try {
+      const form = new FormData();
+      form.append('file', file);
+
+      const response = await fetch('/api/upload/photo', {
+        method: 'POST',
+        body: form
+      });
+
+      const result: PhotoUploadResponse = await response.json();
+
+      if (result.success && result.photoUrl) {
+        return result.photoUrl;
+      } else {
+        console.error('Upload failed:', result.error);
+        return null;
+      }
+    } catch (error) {
+      console.error('Photo upload failed:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
     console.log('Submitting registration:', formData);
 
     try {
+        // Upload photo first if provided
+        let photoUrl: string | null = null;
+        if (formData.photo) {
+          photoUrl = await uploadPhoto(formData.photo);
+          if (!photoUrl) {
+            alert('Failed to upload photo. Please try again.');
+            return;
+          }
+        }
+
         const response = await fetch('/api/v1/professional/register', {
             method: 'POST',
             headers: {
@@ -205,7 +246,7 @@ export function ProfessionalRegistrationPage() {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 phone: formData.phone,
-                photo_url: formData.photo ? 'TODO' : null,
+                photo_url: photoUrl,
                 professional_type: formData.professionalType,
                 license_number: formData.licenseNumber,
                 license_state: formData.licenseState,

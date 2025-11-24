@@ -1,6 +1,7 @@
 package com.shadowconnect.routes
 
 import com.shadowconnect.service.R2StorageService
+import com.shadowconnect.shared.model.PhotoUploadResponse
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -10,14 +11,6 @@ import io.ktor.server.routing.*
 import io.ktor.util.asStream
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import io.ktor.utils.io.*
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class PhotoUploadResponse(
-    val success: Boolean,
-    val photoUrl: String? = null,
-    val error: String? = null
-)
 
 fun Route.fileUploadRouting() {
     val r2Service = R2StorageService()
