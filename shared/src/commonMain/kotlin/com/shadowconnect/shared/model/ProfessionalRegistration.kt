@@ -119,6 +119,19 @@ data class DayAvailability(
                 )
             }.toTypedArray()
         }
+
+        /**
+         * Converts JS Array back to Kotlin List for backend consumption
+         */
+        @JsName("toKtList")
+        fun toKtList(jsArray: Array<DayAvailabilityJS>): List<DayAvailability> {
+            return jsArray.map { jsAvail ->
+                DayAvailability(
+                    day = jsAvail.day,
+                    timeRanges = jsAvail.timeRanges.toList()
+                )
+            }
+        }
     }
 }
 
@@ -151,3 +164,86 @@ data class ProfessionalRegistrationResponse(
     @SerialName("error_details")
     val errorDetails: String? = null
 )
+
+
+/**
+ * Request model for updating an existing professional profile.
+ * Excludes email/password which are updated via separate endpoints.
+ */
+@Serializable
+data class UpdateProfessionalRequest(
+    val firstName: String,
+    val lastName: String,
+    val phone: String,
+    val professionalType: ProfessionalType,
+    val licenseNumber: String?,
+    val licenseState: String?,
+    val specialization: MedicalSpecialty?,
+    val yearsExperience: Int?,
+    val practiceType: PracticeType?,
+    val practiceName: String?,
+    val practiceAddress: String?,
+    val practiceCity: String?,
+    val practiceState: String?,
+    val practiceZip: String?,
+    val titlePosition: String?,
+    val bio: String?,
+    val photoUrl: String?,
+    val availability: List<DayAvailability>,
+    val availabilityNotes: String?
+) {
+    fun toJsonString(): String {
+        return Json.encodeToString(serializer(), this)
+    }
+
+    companion object {
+        /**
+         * Factory method for creating UpdateProfessionalRequest from JS-friendly primitives
+         * Handles string→enum conversion and Array→List conversion at the boundary
+         */
+        @JsName("fromJsData")
+        fun fromJsData(
+            firstName: String,
+            lastName: String,
+            phone: String,
+            professionalType: String,  // String, not enum
+            licenseNumber: String?,
+            licenseState: String?,
+            specialization: String?,  // String, not enum
+            yearsExperience: Int?,
+            practiceType: String?,  // String, not enum
+            practiceName: String?,
+            practiceAddress: String?,
+            practiceCity: String?,
+            practiceState: String?,
+            practiceZip: String?,
+            titlePosition: String?,
+            bio: String?,
+            photoUrl: String?,
+            availability: Array<DayAvailabilityJS>,  // JS-friendly array
+            availabilityNotes: String?
+        ): UpdateProfessionalRequest {
+            return UpdateProfessionalRequest(
+                firstName = firstName,
+                lastName = lastName,
+                phone = phone,
+                professionalType = ProfessionalType.valueOf(professionalType),
+                licenseNumber = licenseNumber,
+                licenseState = licenseState,
+                specialization = specialization?.let { MedicalSpecialty.valueOf(it) },
+                yearsExperience = yearsExperience,
+                practiceType = practiceType?.let { PracticeType.valueOf(it) },
+                practiceName = practiceName,
+                practiceAddress = practiceAddress,
+                practiceCity = practiceCity,
+                practiceState = practiceState,
+                practiceZip = practiceZip,
+                titlePosition = titlePosition,
+                bio = bio,
+                photoUrl = photoUrl,
+                availability = DayAvailability.toKtList(availability),
+                availabilityNotes = availabilityNotes
+            )
+        }
+    }
+}
