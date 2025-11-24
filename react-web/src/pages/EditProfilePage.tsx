@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../contexts/SessionContext.tsx';
-import { UserInfo, UserType, Professional, ProfessionalType, MedicalSpecialty, PracticeType, USStates, DayOfWeek, TimeRange, DayAvailability } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import { UserInfo, UserType, Professional, ProfessionalType, MedicalSpecialty, PracticeType, USStates, DayOfWeek, TimeRange, DayAvailability, DayAvailabilityJS } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 import { SEOHead} from '../components/SEOHead.tsx';
 import {PhotoUpload} from "../components/PhotoUpload.tsx";
 import type { FormData } from '../types/FormData.ts';
 import {useAvailabilityHandlers} from "../hooks/useAvailabilityHandlers.ts";
+import { UpdateProfessionalRequest } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 
 const INITIAL_FORM_DATA: FormData = {
     firstName: '',
@@ -136,7 +137,7 @@ function ProfessionalEditForm() {
 
                     // Parse availability JSON string using Kotlin serializer
                     // The Kotlin function converts everything to JS arrays at the boundary
-                    let availabilityArray: any[] = [];
+                    let availabilityArray: DayAvailabilityJS[] = [];
                     if (data.availability) {
                         try {
                             availabilityArray = DayAvailability.Companion.fromJsonArray(data.availability);
@@ -201,10 +202,50 @@ function ProfessionalEditForm() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            // TODO: Implement save logic
-            console.log('Saving:', formData);
+            // Use factory method - handles all string→enum and array→list conversions in Kotlin
+            const request: UpdateProfessionalRequest = UpdateProfessionalRequest.Companion.fromJsData(
+                formData.firstName,
+                formData.lastName,
+                formData.phone,
+                formData.professionalType,  // String, factory converts to enum
+                formData.licenseNumber || null,
+                formData.licenseState || null,
+                formData.medicalSpecialty || null,  // String, factory converts to enum
+                formData.yearsExperience ? parseInt(formData.yearsExperience) : null,
+                formData.practiceType || null,  // String, factory converts to enum
+                formData.practiceName || null,
+                formData.practiceAddress || null,
+                formData.practiceCity || null,
+                formData.practiceState || null,
+                formData.practiceZip || null,
+                formData.titlePosition || null,
+                formData.bio || null,
+                null, // photoUrl - handled separately
+                formData.availability,  // DayAvailabilityJS[], factory converts to List<DayAvailability>
+                formData.availabilityNotes || null
+            );
+
+            console.log('Saving:', request);
+            const response = await fetch('/api/v1/professional/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: request.toJsonString()
+            });
+
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                navigate('/dashboard');
+            } else {
+                const errorText = await response.text();
+                console.error('Save failed:', response.status, errorText);
+                alert(`Save failed: ${response.status} - ${errorText}`);
+            }
         } catch (error) {
             console.error('Save failed:', error);
+            alert(`Save failed: ${error}`);
         } finally {
             setIsSaving(false);
         }

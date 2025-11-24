@@ -1,11 +1,4 @@
-import { DayOfWeek, TimeRange } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
-
-// TypeScript version for React state (uses plain JS arrays)
-// This mirrors the Kotlin DayAvailability but works with React's array methods
-export type DayAvailability = {
-    day: DayOfWeek;
-    timeRanges: TimeRange[];  // Plain JS array, not KList
-};
+import { DayAvailabilityJS } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 
 export type FormData = {
     // Step 1: Basic Information
@@ -34,7 +27,7 @@ export type FormData = {
     titlePosition: string;
 
     // Step 4: Availability
-    availability: DayAvailability[];  // Uses our TypeScript version
+    availability: DayAvailabilityJS[];  // Uses Kotlin boundary type with JS arrays
 
     // Step 5: Profile
     bio: string;

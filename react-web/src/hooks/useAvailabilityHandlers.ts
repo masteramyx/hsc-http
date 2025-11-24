@@ -1,4 +1,4 @@
-import { DayOfWeek, TimeRange } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
+import { DayOfWeek, TimeRange, DayAvailabilityJS } from '../../../shared/build/dist/js/productionLibrary/hsc-http-shared.js';
 import type { FormData } from '../types/FormData';
 
 /**
@@ -17,7 +17,7 @@ export function useAvailabilityHandlers(
             const isCurrentlySelected = prev.availability.some(avail => avail.day === day);
             const newAvailability = isCurrentlySelected
                 ? prev.availability.filter(selectedDay => selectedDay.day !== day)
-                : prev.availability.concat({day, timeRanges: []});
+                : prev.availability.concat(new DayAvailabilityJS(day, []));
             return {...prev, availability: newAvailability }
         });
 
@@ -40,11 +40,11 @@ export function useAvailabilityHandlers(
                         ? dayAvail.timeRanges.filter(tr => tr !== timeRange)
                         : [...dayAvail.timeRanges, timeRange];
 
-                    // return updated day object
-                    return {...dayAvail, timeRanges: newTimeRanges}
+                    // return updated day object - use constructor
+                    return new DayAvailabilityJS(dayAvail.day, newTimeRanges);
                 }
 
-                // bug - not the right day....do nothing
+                // not the right day....do nothing
                 return dayAvail;
             });
 
