@@ -72,17 +72,21 @@ interface ProfessionalRepository {
         lastName: String,
         phone: String,
         professionalType: ProfessionalType,
-        photoUrl: String? = null,
+        licenseNumber: String? = null,
+        licenseState: String? = null,
         specialization: MedicalSpecialty? = null,
+        yearsExperience: Int? = null,
         practiceType: PracticeType? = null,
+        practiceName: String? = null,
+        practiceAddress: String? = null,
         practiceCity: String? = null,
         practiceState: String? = null,
-        practiceAddress: String? = null,
+        practiceZip: String? = null,
+        titlePosition: String? = null,
         bio: String? = null,
-        specialties: String? = null,
-        studentRequirements: String? = null,
-        availableDays: String? = null,
-        availableTimes: String? = null
+        photoUrl: String? = null,
+        availabilityJson: String? = null,
+        availabilityNotes: String? = null
     ): Boolean
 
     /**
