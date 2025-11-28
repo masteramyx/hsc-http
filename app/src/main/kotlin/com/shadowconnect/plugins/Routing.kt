@@ -4,6 +4,7 @@ import com.shadowconnect.routes.userRouting
 import com.shadowconnect.routes.authRouting
 import com.shadowconnect.routes.chatRouting
 import com.shadowconnect.routes.contactRouting
+import com.shadowconnect.routes.emailVerificationRouting
 import com.shadowconnect.routes.fileUploadRouting
 import com.shadowconnect.routes.professionalRouting
 import com.shadowconnect.db.DatabaseFactory
@@ -41,6 +42,7 @@ fun Application.configureRouting() {
         authRouting()
         chatRouting()
         contactRouting()
+        emailVerificationRouting()
         fileUploadRouting()
         professionalRouting()
         

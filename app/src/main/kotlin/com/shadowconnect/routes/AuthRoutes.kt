@@ -43,7 +43,12 @@ fun Route.authRouting() {
                     LoginResponse(
                         success = true,
                         message = "Login successful",
-                        user = UserInfo(user.id, user.email, userType)
+                        user = UserInfo(
+                            id = user.id,
+                            email = user.email,
+                            userType = userType,
+                            emailVerified = user.email_verified ?: false
+                        )
                     )
                 )
             } else {
@@ -73,12 +78,18 @@ fun Route.authRouting() {
         get("/me") {
             val session = call.sessions.get<UserSession>()
             if (session != null) {
+                val user = userRepository.findById(session.userId)
                 call.respond(
                     HttpStatusCode.OK,
                     LoginResponse(
                         success = true,
                         message = "Authenticated",
-                        user = UserInfo(session.userId, session.email, session.userType)
+                        user = UserInfo(
+                            id = session.userId,
+                            email = session.email,
+                            userType = session.userType,
+                            emailVerified = user?.email_verified ?: false
+                        )
                     )
                 )
             } else {
