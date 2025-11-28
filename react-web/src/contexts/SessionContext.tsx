@@ -42,7 +42,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
             const userInfo: UserInfo = new UserInfo(
                 data.user.id,
                 data.user.email,
-                UserType.Companion.fromString(data.user.userType)
+                UserType.Companion.fromString(data.user.userType),
+                data.user.emailVerified
             );
           setSessionState(createSessionState({
             isLoggedIn: true,
