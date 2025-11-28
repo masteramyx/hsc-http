@@ -48,6 +48,9 @@ dependencies {
     // AWS SDK for R2 Storage
     implementation(libs.aws.s3)
 
+    // Resend for email sending
+    implementation(libs.resend)
+
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.mock)
