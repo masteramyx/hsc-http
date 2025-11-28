@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { SessionProvider } from './contexts/SessionContext';
 import { Header } from './components/Header';
+import { EmailVerificationBanner } from './components/EmailVerificationBanner';
 import { Footer } from './components/Footer';
 import { ChatWidget } from './components/ChatWidget';
 import { HomePage } from './pages/HomePage';
@@ -12,6 +13,7 @@ import { ForStudentsPage } from './pages/ForStudentsPage';
 import { ForProfessionalsPage } from './pages/ForProfessionalsPage';
 import { ProfessionalRegistrationPage } from './pages/ProfessionalRegistrationPage';
 import { ProfessionalWelcomePage } from "./pages/ProfessionalWelcomePage.tsx";
+import { EmailVerificationPage } from './pages/EmailVerificationPage';
 import { LoginPage } from './pages/LoginPage';
 import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {EditProfilePage} from "./pages/EditProfilePage.tsx";
@@ -35,6 +37,7 @@ function App() {
         <SessionProvider>
           <div className="min-h-screen">
             <Header />
+            <EmailVerificationBanner />
             <main className="pt-16">
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -46,6 +49,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register/professional" element={<ProfessionalRegistrationPage />} />
                 <Route path="/welcome/professional" element={<ProfessionalWelcomePage />} />
+                <Route path="/verify-email" element={<EmailVerificationPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile/edit" element={<EditProfilePage />} />
               </Routes>
