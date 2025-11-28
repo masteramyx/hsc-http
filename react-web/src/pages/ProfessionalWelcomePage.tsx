@@ -26,6 +26,25 @@ export function ProfessionalWelcomePage() {
                         </p>
                     </div>
 
+                    {/* Email verification notice */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                        <div className="flex items-start gap-3">
+                            <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-1">
+                                    Verify Your Email Address
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                    We've sent a verification email to your inbox. Please click the link
+                                    to verify your email address and unlock all features.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Next steps card */}
                     <div className="bg-white rounded-lg shadow-md p-8">
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">
