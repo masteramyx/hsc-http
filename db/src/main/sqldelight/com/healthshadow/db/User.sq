@@ -1,12 +1,14 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    id           SERIAL8 PRIMARY KEY,
-    email        varchar(255) NOT NULL UNIQUE,
-    password_hash varchar(255) NOT NULL,
-    user_type    varchar(20)  NOT NULL CHECK (user_type IN ('student', 'professional', 'admin')),
-    created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-    is_active    BOOLEAN      DEFAULT TRUE
+    id                SERIAL8 PRIMARY KEY,
+    email             varchar(255) NOT NULL UNIQUE,
+    password_hash     varchar(255) NOT NULL,
+    user_type         varchar(20)  NOT NULL CHECK (user_type IN ('student', 'professional', 'admin')),
+    created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    is_active         BOOLEAN      DEFAULT TRUE,
+    email_verified    BOOLEAN      DEFAULT FALSE,
+    email_verified_at TIMESTAMP
 );
 
 -- Get user by ID
@@ -42,3 +44,26 @@ SELECT * FROM users WHERE is_active = TRUE ORDER BY created_at DESC;
 -- Get users by type
 getUsersByType:
 SELECT * FROM users WHERE user_type = ? AND is_active = TRUE ORDER BY created_at DESC;
+
+-- Mark email as verified
+markEmailVerified:
+UPDATE users
+SET email_verified = TRUE,
+    email_verified_at = CURRENT_TIMESTAMP,
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = ?;
+
+-- Get unverified users older than cutoff timestamp
+getUnverifiedUsersOlderThan:
+SELECT * FROM users
+WHERE email_verified = FALSE
+  AND created_at < ?
+  AND is_active = TRUE;
+
+-- Get first name for any user from their user ID
+getUserFirstName:
+SELECT COALESCE(p.first_name, s.first_name) AS firstName
+FROM users u
+LEFT JOIN professional p ON u.id = p.user_id AND u.user_type = 'PROFESSIONAL'
+LEFT JOIN student s ON u.id = s.user_id AND u.user_type = 'STUDENT'
+WHERE u.id = ?;
