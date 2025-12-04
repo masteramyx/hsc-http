@@ -17,6 +17,7 @@ import { EmailVerificationPage } from './pages/EmailVerificationPage';
 import { LoginPage } from './pages/LoginPage';
 import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {EditProfilePage} from "./pages/EditProfilePage.tsx";
+import ScrollToTop from "./utils/scrollToTop.tsx";
 
 /**
  * Root application component with three context providers:
@@ -38,6 +39,7 @@ function App() {
           <div className="min-h-screen">
             <Header />
             <EmailVerificationBanner />
+            <ScrollToTop />
             <main className="pt-16">
               <Routes>
                 <Route path="/" element={<HomePage />} />
