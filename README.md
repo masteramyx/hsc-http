@@ -248,7 +248,7 @@ cd ..
   react-web/build/
 
 **Development vs Production:**
-- Development: `npm run dev` starts a local server at localhost:3000 with hot-reload
+- Development: `npm run dev` starts a local server at localhost:3002 with hot-reload
 - Production: `npm run build` creates optimized files in react-web/build/ for deployment
 
 ##### 2. Build the Docker Image
@@ -622,7 +622,7 @@ Without CORS, any malicious website could make requests to your bank's API using
 
 **CORS is Required When:**
 - Frontend and backend are on different domains/subdomains
-- Frontend runs on `localhost:3000` and backend on `localhost:8080`
+- Frontend runs on `localhost:3002` and backend on `localhost:8080`
 - Mobile apps making API requests
 - Third-party services accessing your API
 
@@ -643,7 +643,7 @@ fun Application.configureCORS() {
         allowCredentials = true           // Allow cookies/sessions
 
         // Allow specific origins
-        allowHost("localhost:3000", listOf("http", "https"))
+        allowHost("localhost:3002", listOf("http", "https"))
         allowHost("shadowconnects.com", listOf("https"))
     }
 }
