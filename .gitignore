@@ -39,6 +39,7 @@ out/
 CLAUDE.md
 
 ### Environment files with secrets ###
+.env
 .env.local
 .env.production
 
