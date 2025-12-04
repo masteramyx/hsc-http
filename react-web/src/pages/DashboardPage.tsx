@@ -116,8 +116,8 @@ export function DashboardPage() {
                     <span className="font-medium">Organization:</span> {profile.practiceName || 'Not specified'}
                   </p>
                   <p className="text-gray-700">
-                    <span className="font-medium">Verified:</span>{' '}
-                    {profile.verified ? (
+                    <span className="font-medium">Email Verified:</span>{' '}
+                    {user.emailVerified ? (
                       <span className="text-green-600">✓ Verified</span>
                     ) : (
                       <span className="text-yellow-600">Pending Verification</span>

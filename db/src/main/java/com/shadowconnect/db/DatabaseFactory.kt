@@ -50,8 +50,27 @@ object DatabaseFactory {
         dataSource = HikariDataSource(config)
         val driver = dataSource?.asJdbcDriver() ?: throw IllegalStateException("Failed to create DataSource")
 
-        // Create tables if they don't exist
+        // Create base schema
         HealthShadowDatabase.Schema.create(driver)
+
+        // Create temp DB instance to access queries
+        val tempDb = HealthShadowDatabase(driver)
+
+        // Get current schema version
+        val currentVersion: Long = try {
+            tempDb.schemaVersionQueries.getVersion().executeAsOneOrNull()?.toLong() ?: 0L
+        } catch (e: Exception) {
+            0L // Table doesn't exist yet
+        }
+
+        val targetVersion: Long = HealthShadowDatabase.Schema.version
+
+        // Run migrations if needed
+        if (currentVersion < targetVersion) {
+            HealthShadowDatabase.Schema.migrate(driver, currentVersion, targetVersion)
+            tempDb.schemaVersionQueries.deleteAll()
+            tempDb.schemaVersionQueries.insertVersion(targetVersion.toInt())
+        }
 
         database = HealthShadowDatabase(driver)
     }

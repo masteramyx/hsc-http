@@ -31,7 +31,12 @@ data class LoginResponse(val success: Boolean, val message: String, val user: Us
 data class LogoutResponse(val success: Boolean, val message: String)
 
 @Serializable
-data class UserInfo(val id: Long, val email: String, val userType: UserType)
+data class UserInfo(
+    val id: Long,
+    val email: String,
+    val userType: UserType,
+    val emailVerified: Boolean = false
+)
 
 @Serializable
 data class SessionState(

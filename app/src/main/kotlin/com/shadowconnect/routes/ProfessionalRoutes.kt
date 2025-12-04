@@ -3,9 +3,11 @@ package com.shadowconnect.routes
 import com.shadowconnect.auth.AuthService
 import com.shadowconnect.auth.UserSession
 import com.shadowconnect.db.DatabaseFactory
+import com.shadowconnect.db.EmailVerificationTokenRepositoryImpl
 import com.shadowconnect.db.ProfessionalRepositoryImpl
 import com.shadowconnect.db.UserRepositoryImpl
-import com.shadowconnect.shared.model.DayAvailability
+import com.shadowconnect.service.EmailClient
+import com.shadowconnect.service.EmailVerificationService
 import com.shadowconnect.shared.model.Professional
 import com.shadowconnect.shared.model.ProfessionalRegistrationRequest
 import com.shadowconnect.shared.model.ProfessionalRegistrationResponse
@@ -27,6 +29,11 @@ fun Route.professionalRouting() {
     val professionalRepository = ProfessionalRepositoryImpl(database)
     val userRepository = UserRepositoryImpl(database)
     val authService = AuthService(userRepository)
+    val tokenRepository = EmailVerificationTokenRepositoryImpl(database)
+    val emailClient = EmailClient()
+    val verificationService = EmailVerificationService(
+        tokenRepository, userRepository, emailClient
+    )
 
     route("/api/v1") {
         // Public browsing endpoints
@@ -202,6 +209,19 @@ fun Route.professionalRouting() {
                         userType = UserType.PROFESSIONAL,
                     )
                     call.sessions.set(session)
+
+                    // Send verification email (non-blocking, don't fail registration if email fails)
+                    try {
+                        verificationService.sendVerificationEmail(
+                            result.userId,
+                            request.email,
+                            request.firstName
+                        )
+                        logger.info("POST /api/v1/professional/register - Verification email sent to ${request.email}")
+                    } catch (e: Exception) {
+                        logger.error("POST /api/v1/professional/register - Failed to send verification email: ${e.message}", e)
+                        // Continue with registration success - user can resend later
+                    }
 
                     call.respond(
                         HttpStatusCode.Created,

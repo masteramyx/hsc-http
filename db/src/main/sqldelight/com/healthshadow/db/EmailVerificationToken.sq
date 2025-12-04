@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS email_verification_tokens
+(
+    id         SERIAL8 PRIMARY KEY,
+    user_id    BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token      VARCHAR(255) NOT NULL UNIQUE,
+    expires_at TIMESTAMP    NOT NULL,
+    used_at    TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_verification_token ON email_verification_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_verification_user ON email_verification_tokens(user_id);
+
+-- Get token by token value
+getTokenByValue:
+SELECT * FROM email_verification_tokens WHERE token = ?;
+
+-- Create token
+createToken:
+INSERT INTO email_verification_tokens (user_id, token, expires_at)
+VALUES (?, ?, ?)
+RETURNING id;
+
+-- Mark token as used
+markTokenUsed:
+UPDATE email_verification_tokens
+SET used_at = CURRENT_TIMESTAMP
+WHERE token = ?;
+
+-- Delete expired tokens (cleanup)
+deleteExpiredTokens:
+DELETE FROM email_verification_tokens
+WHERE expires_at < CURRENT_TIMESTAMP;
+
+-- Get active token for user
+getActiveTokenForUser:
+SELECT * FROM email_verification_tokens
+WHERE user_id = ?
+  AND used_at IS NULL
+  AND expires_at > CURRENT_TIMESTAMP
+ORDER BY created_at DESC
+LIMIT 1;

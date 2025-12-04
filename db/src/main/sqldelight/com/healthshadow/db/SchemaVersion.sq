@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS schema_version
+(
+    version    INTEGER PRIMARY KEY
+);
+
+getVersion:
+SELECT version FROM schema_version LIMIT 1;
+
+deleteAll:
+DELETE FROM schema_version;
+
+insertVersion:
+INSERT INTO schema_version (version) VALUES (?);
