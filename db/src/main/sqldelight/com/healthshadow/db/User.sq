@@ -64,6 +64,6 @@ WHERE email_verified = FALSE
 getUserFirstName:
 SELECT COALESCE(p.first_name, s.first_name) AS firstName
 FROM users u
-LEFT JOIN professional p ON u.id = p.user_id AND u.user_type = 'PROFESSIONAL'
-LEFT JOIN student s ON u.id = s.user_id AND u.user_type = 'STUDENT'
+LEFT JOIN professional p ON u.id = p.user_id AND u.user_type = 'professional'
+LEFT JOIN student s ON u.id = s.user_id AND u.user_type = 'student'
 WHERE u.id = ?;
