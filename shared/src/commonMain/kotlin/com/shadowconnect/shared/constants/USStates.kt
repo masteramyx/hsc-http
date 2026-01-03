@@ -1,7 +1,9 @@
 @file:JsExport
+@file:OptIn(ExperimentalJsExport::class)
 
 package com.shadowconnect.shared.constants
 
+import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
 /**
