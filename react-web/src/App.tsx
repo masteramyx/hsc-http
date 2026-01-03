@@ -18,6 +18,7 @@ import { LoginPage } from './pages/LoginPage';
 import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {EditProfilePage} from "./pages/EditProfilePage.tsx";
 import ScrollToTop from "./utils/scrollToTop.tsx";
+import {DocumentUploadPage} from "./pages/DocumentUploadPage.tsx";
 
 /**
  * Root application component with three context providers:
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/verify-email" element={<EmailVerificationPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/profile/edit" element={<EditProfilePage />} />
+                <Route path="/documents/upload" element={<DocumentUploadPage />} />
               </Routes>
             </main>
             <Footer />
