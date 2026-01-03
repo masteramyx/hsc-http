@@ -34,6 +34,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init-documenso.sql:/docker-entrypoint-initdb.d/init-documenso.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U hsc_user -d healthshadow_dev"]
       interval: 10s
@@ -72,6 +73,47 @@ services:
       - "traefik.http.routers.hsc-app.entrypoints=websecure"
       - "traefik.http.routers.hsc-app.tls.certresolver=letsencrypt"
       - "traefik.http.services.hsc-app.loadbalancer.server.port=8080"
+
+  documenso:
+    image: documenso/documenso:latest
+    container_name: hsc-documenso-dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Auth secrets
+      - NEXTAUTH_SECRET=supersecretkey123456789012345678
+      - NEXT_PRIVATE_ENCRYPTION_KEY=01234567890123456789012345678901
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=98765432109876543210987654321098
+
+      # URLs
+      - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3000
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
+
+      # Database - uses separate database in same postgres container
+      - NEXT_PRIVATE_DATABASE_URL=postgresql://hsc_user:hsc_dev_password@postgres:5432/documenso_dev
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://hsc_user:hsc_dev_password@postgres:5432/documenso_dev
+
+      # Email - add your Resend API key
+      - NEXT_PRIVATE_SMTP_HOST=smtp.resend.com
+      - NEXT_PRIVATE_SMTP_PORT=587
+      - NEXT_PRIVATE_SMTP_USERNAME=resend
+      - NEXT_PRIVATE_SMTP_PASSWORD=${RESEND_API_KEY}
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@shadowconnects.com
+      - NEXT_PRIVATE_SMTP_FROM_NAME=ShadowConnects
+
+      # Signing
+      - NEXT_PRIVATE_SIGNING_TRANSPORT=local
+
+      # Storage - use database for local dev
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=database
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:

@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS professional_documents
+(
+    id              SERIAL8     PRIMARY KEY,
+    user_id         BIGINT  NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    external_doc_id INTEGER,
+    envelope_id     varchar(50),
+    title           TEXT,
+    status          TEXT,
+    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
+);
+
+
+createDocument:
+    INSERT INTO professional_documents(
+        user_id,
+        external_doc_id,
+        envelope_id,
+        title,
+        status
+    ) VALUES (?,?,?,?,?)
+    RETURNING id;
