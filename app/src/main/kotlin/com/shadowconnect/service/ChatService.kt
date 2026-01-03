@@ -1,5 +1,6 @@
 package com.shadowconnect.service
 
+import com.shadowconnect.httpClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -62,9 +63,7 @@ class ChatService() {
     private val apiKey = System.getenv("ANTHROPIC_API_KEY")
         ?: throw IllegalStateException("ANTHROPIC_API_KEY environment variable not set")
 
-    private val client = HttpClient(CIO) {
-        expectSuccess = false
-    }
+
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -73,7 +72,7 @@ class ChatService() {
 
     private suspend fun streamSSE(url: String, requestBody: String): Flow<SSEEvent> = flow {
         // make request
-        val response = client.post(url) {
+        val response = httpClient.post(url) {
             headers {
                 append("x-api-key",apiKey)
                 append("anthropic-version","2023-06-01")
@@ -155,6 +154,6 @@ class ChatService() {
             }
 
     fun close() {
-        client.close()
+        httpClient.close()
     }
 }

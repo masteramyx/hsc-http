@@ -1,12 +1,13 @@
 package com.shadowconnect
 
-import io.ktor.server.application.*
-import com.shadowconnect.plugins.*
 import com.shadowconnect.db.DatabaseFactory
+import com.shadowconnect.plugins.*
 import com.shadowconnect.utils.logger
-import io.ktor.server.auth.*
-import io.ktor.server.sessions.*
-import com.shadowconnect.auth.UserSession
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.Charsets
+import io.ktor.client.plugins.logging.*
+import io.ktor.server.application.*
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
@@ -27,4 +28,16 @@ fun Application.module() {
     configureSerialization()
     
     logger.info("Application configuration complete")
+}
+
+val httpClient = HttpClient(CIO) {
+    install(Logging) {
+        logger = Logger.DEFAULT
+        level = LogLevel.ALL
+    }
+    expectSuccess = false
+
+    Charsets {
+        register(Charsets.UTF_8)
+    }
 }

@@ -8,6 +8,7 @@ import com.shadowconnect.routes.emailVerificationRouting
 import com.shadowconnect.routes.fileUploadRouting
 import com.shadowconnect.routes.professionalRouting
 import com.shadowconnect.db.DatabaseFactory
+import com.shadowconnect.routes.documentRouting
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -45,6 +46,7 @@ fun Application.configureRouting() {
         emailVerificationRouting()
         fileUploadRouting()
         professionalRouting()
+        documentRouting()
         
         // This logic handles serving the correct frontend files for different environments.
         // Priority: React frontend > Compose Web frontend
