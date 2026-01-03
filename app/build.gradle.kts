@@ -45,11 +45,16 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:2.3.12")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
 
+    // OkHttp for Documenso API
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // AWS SDK for R2 Storage
     implementation(libs.aws.s3)
 
     // Resend for email sending
     implementation(libs.resend)
+    implementation("io.ktor:ktor-server-call-logging:2.3.12")
+    implementation("io.ktor:ktor-client-logging:2.3.12")
 
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
