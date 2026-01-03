@@ -144,6 +144,24 @@ export function DashboardPage() {
             </div>
           )}
 
+          {/* Document Section */}
+          <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Documents
+              </h2>
+              <button
+                onClick={() => navigate('/documents/upload')}
+                className="text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+              >
+                <div>
+                  <h5 className="font-medium text-gray-900">Upload Document</h5>
+                </div>
+              </button>
+            </div>
+            <p className="text-gray-500">No documents uploaded</p>
+          </div>
+
           {/* Activity Placeholder */}
           <div className="bg-white rounded-lg shadow-md p-8 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
